@@ -22,7 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-´
-# Ignore first three project folders
-first-three-project/*
-first-three-project
