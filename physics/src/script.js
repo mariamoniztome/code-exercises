@@ -247,7 +247,7 @@ const createBox = (width, height, depth, position) => {
   });
 };
 
-createBox(0.5, 0.5, 0.5, { x: 0, y: 3, z: 0 });
+// createBox(0.5, 0.5, 0.5, { x: 0, y: 3, z: 0 });
 
 /**
  * Animate
