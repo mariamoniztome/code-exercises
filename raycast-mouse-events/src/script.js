@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-// import GUI from 'lil-gui' 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -80,6 +82,25 @@ window.addEventListener('click', () =>
   }
 })
 
+// Models
+const gltfLoader = new GLTFLoader()
+let model = null
+gltfLoader.load('./static/models/Duck/glTF-Binary/Duck.glb', (gltf) =>
+{
+  model = gltf.scene
+  gltf.scene.position.y = -1.2
+  scene.add(model)
+})
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.9)
+scene.add(ambientLight)
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2.1)
+directionalLight.position.set(1, 1, 0)
+scene.add(directionalLight)
+
+// Animate
 const clock = new THREE.Clock()
 
 function tick()
@@ -110,6 +131,10 @@ function tick()
   } else {
     if (currentIntersect !== null) console.log('mouse leave')
     currentIntersect = null
+  }
+
+  if (model){
+    const modelIntersects = raycaster.intersectObject(model, true)
   }
 
   // Render
