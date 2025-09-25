@@ -36,12 +36,29 @@ const environmentMapTexture = cubeTextureLoader.load([
 const world = new CANNON.World()
 world.gravity.set(0, -9.82, 0) // m/s²
 
+// Materials
+const concreteMaterial = new CANNON.Material('concrete')
+const plasticMaterial = new CANNON.Material('plastic')
+
+const concretePlasticContactMaterial = new CANNON.ContactMaterial(
+    concreteMaterial,
+    plasticMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.7
+    }
+)
+
+world.addContactMaterial(concretePlasticContactMaterial)
+world.defaultContactMaterial = concretePlasticContactMaterial
+
 // Sphere
 const sphereShape = new CANNON.Sphere(0.5)
 const sphereBody = new CANNON.Body({
     mass: 1,
     position: new CANNON.Vec3(0, 3, 0),
-    shape: sphereShape
+    shape: sphereShape,
+    material: plasticMaterial  
 })
 world.addBody(sphereBody)
 
@@ -55,7 +72,7 @@ world.addBody(floorBody)
 
 
 /**
- * Test sphere
+ * Sphere
  */
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 32, 32),
@@ -80,7 +97,8 @@ const floor = new THREE.Mesh(
         metalness: 0.3,
         roughness: 0.4,
         envMap: environmentMapTexture,
-        envMapIntensity: 0.5
+        envMapIntensity: 0.5,
+        material: concreteMaterial
     })
 )
 floor.receiveShadow = true
