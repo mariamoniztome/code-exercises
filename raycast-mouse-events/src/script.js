@@ -134,7 +134,12 @@ function tick()
   }
 
   if (model){
-    const modelIntersects = raycaster.intersectObject(model, true)
+    const modelIntersects = raycaster.intersectObject(model)
+    if (modelIntersects.length) {
+      model.scale.set(1.2, 1.2, 1.2)
+    } else {
+      model.scale.set(1, 1, 1)
+    }
   }
 
   // Render
