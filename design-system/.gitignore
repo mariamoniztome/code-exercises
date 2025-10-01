@@ -1,0 +1,60 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node.js
+node_modules/
+
+# Build files
+build/
+dist/
+out/
+dist-ssr/
+
+# Dependency lock files
+node_modules/
+yarn.lock
+package-lock.json
+
+# Compiled files
+*.json
+*.lock
+*.swp
+*.tgz
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Environment variables
+.env*
+
+# IDE/Editor settings
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Local files
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
