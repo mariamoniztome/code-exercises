@@ -12,59 +12,87 @@ app.get('/api', (req, res) => {
   const { industry, country, continent, is_seeking_funding, has_mvp } = req.query
 
   if (industry) {
-    filteredData = filteredData.filter( startup => 
-      startup.industry.toLowerCase() === industry.toLowerCase()
+    filteredData = filteredData.filter(startup =>
+      startup.industry.toLowerCasae() === industry.toLowerCase()
     )
   }
 
   if (country) {
-    filteredData = filteredData.filter( startup => 
+    filteredData = filteredData.filter(startup =>
       startup.country.toLowerCase() === country.toLowerCase()
     )
   }
-  
+
   if (continent) {
-    filteredData = filteredData.filter( startup => 
+    filteredData = filteredData.filter(startup =>
       startup.continent.toLowerCase() === continent.toLowerCase()
     )
   }
 
   if (is_seeking_funding) {
-    filteredData = filteredData.filter( startup => 
+    filteredData = filteredData.filter(startup =>
       startup.is_seeking_funding === JSON.parse(is_seeking_funding.toLowerCase())
     )
   }
-  
+
   if (has_mvp) {
-    filteredData = filteredData.filter( startup => 
+    filteredData = filteredData.filter(startup =>
       startup.has_mvp === JSON.parse(has_mvp.toLowerCase())
     )
   }
-
 
   res.json(filteredData)
 
 })
 
-app.listen(PORT, () => console.log(`server connected on port ${PORT}`))
+
+app.get('/api/:field/:term', (req, res) => {
+  
+  const { field, term } = req.params
+    
+  const allowedFields = ['country', 'continent', 'industry']
+
+
+  if (!allowedFields.includes(field)) {
+    return res.status(400).json({message: "Search field not allowed. Please use only 'country', 'continent', 'industry'" })
+  }
 
 
 /*
 Challenge:
-1. When a user hits the /api endpoint with query params, filter the data so 
-we only serve objects that meet their requirements. 
-     
-The user can filter by the following properties:
-  industry, country, continent, is_seeking_funding, has_mvp
+1. If the client’s 'field' is not supported, serve this object:
+  {message: "Search field not allowed. Please use only 'country', 'continent', 'industry'" }
+2. Chain in the .status(<code>) method to set a status code.
+	What status code should you set?
+3. You might run into an error! Find a solution!
 
-Test Cases
-
-/api?industry=renewable%20energy&country=germany&has_mvp=true
-  Should get the "GreenGrid Energy" object.
-
-/api?industry=renewable%20energy&country=germany&has_mvp=false
-  Should not get any object
-
-/api?continent=asia&is_seeking_funding=true&has_mvp=true
-  should get for objects with IDs 3, 22, 26, 29
+hint.md for help!
 */
+
+  const filteredData = startups.filter(
+    startup => startup[field].toLowerCase() === term.toLowerCase()
+  )
+
+  res.json(filteredData)
+
+})
+
+/*
+** The functionality **
+Get all startups in a given country via api/country/<country name>
+Get all startups in a given continent via api/continent/<continent name>
+Get all startups in a given industry via api/industry/<industry name>
+
+**Test Cases** 
+
+These should work:
+  api/country/india
+  api/continent/europe
+  api/industry/ai
+
+This should return the object given in the challenge above. 
+	api/has_mvp/true
+
+*/
+
+app.listen(PORT, () => console.log(`server connected on port ${PORT}`))
