@@ -1,34 +1,51 @@
-import validator from 'validator'
+import validator from "validator";
+import { getDBConnection } from "../db/db.js";
 
 export async function registerUser(req, res) {
-    
-    let { name, email, username, password } = req.body
+  let { name, email, username, password } = req.body;
 
-    // Validation
-    if (!name || !email || !username || !password) {
-        return res.status(400).json({ error: 'All fields are required.' })
+  if (!name || !email || !username || !password) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+
+  name = name.trim();
+  email = email.trim();
+  username = username.trim();
+
+  if (!/^[a-zA-Z0-9_-]{1,20}$/.test(username)) {
+    return res.status(400).json({
+      error:
+        "Username must be 1–20 characters, using letters, numbers, _ or -.",
+    });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  try {
+    const db = await getDBConnection();
+
+    const existing = await db.get(
+      "SELECT id FROM users WHERE email = ? OR username = ?",
+      [email, username]
+    );
+
+    if (existing) {
+      return res
+        .status(400)
+        .json({ error: "Email or username already in use." });
     }
 
-    if (!validator.isEmail(email)) {
-        return res.status(400).json({ error: 'Invalid email format.' })
-    }
+    const result = await db.run(
+      "INSERT INTO users (name, email, username, password) VALUES (?, ?, ?, ?)",
+      [name, email, username, password]
+    );
 
-    if (password.length < 6) {
-        return res.status(400).json({ error: 'Password must be at least 6 characters long.' })
-    }
+    res.status(201).json({ message: 'User registered'})
 
-    // Remove whitespace
-    name = name.trim()
-    email = email.trim()
-    username = username.trim()
-    password = password.trim()
-
-    // Regex for username: only letters, numbers, underscores, 3-15 chars
-    const usernameRegex = /^[a-zA-Z0-9_-]{1,20}$/
-    if (!usernameRegex.test(username)) {
-        return res.status(400).json({ error: 'Username must be 3-15 characters long and can only contain letters, numbers, and underscores.' })
-    }
-
-    console.log('Registering user with data:', req.body);
-    
- }
+  } catch (err) {
+    console.error("Registration error:", err.message);
+    res.status(500).json({ error: "Registration failed. Please try again." });
+  }
+}
