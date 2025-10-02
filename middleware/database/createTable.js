@@ -9,6 +9,8 @@ async function createTable() {
     driver: sqlite3.Database
   })
 
+    await db.exec("DROP TABLE IF EXISTS products")
+
     await db.exec(`
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
