@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server-router.js"
   },
   "author": "Maria Tomé",
   "license": "ISC"
