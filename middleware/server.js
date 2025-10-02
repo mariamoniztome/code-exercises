@@ -1,5 +1,5 @@
-import e from 'express'
 import express from 'express'
+import { productsRouter } from './routes/products.js'
 
 const app = express() 
 
@@ -14,6 +14,8 @@ const app = express()
 // })
 
 app.use(express.static('public'))
+
+app.use('/api/products', productsRouter)
 
 app.get('/', (req, res) => {
     res.send('<!doctype html><html><body>Hello Express!</body></html>')
