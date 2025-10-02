@@ -12,11 +12,13 @@ async function createTable() {
     await db.exec(`
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      artist TEXT,
+      title TEXT NOT NULL,
+      artist TEXT NOT NULL,
+      price REAL NOT NULL,
+      image TEXT NOT NULL,
+      year INTEGER,
       genre TEXT,
-      price REAL,
-      image TEXT
+      stock INTEGER
     )
   `)
 
