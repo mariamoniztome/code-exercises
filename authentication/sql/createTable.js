@@ -14,10 +14,10 @@ Challenge:
 
       const db = await open({
             filename: path.join('database.db'),
-            driver: sqlite3.database
+            driver: sqlite3.Database
       }) 
  
-      await db.insert(`
+      await db.exec(`
             CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
