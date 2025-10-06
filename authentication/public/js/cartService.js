@@ -4,13 +4,11 @@ export function addBtnListeners() {
       const albumId = event.currentTarget.dataset.id
 
       try {
-        // Get userId from localStorage (assumes it is stored after login)
-        const userId = localStorage.getItem('userId');
         const res = await fetch('/api/cart/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ productId: albumId, userId })
+          body: JSON.stringify({ productId: albumId })
         })
 
         if (!res.ok) {
@@ -57,6 +55,7 @@ async function fetchCartItems({ userMessage, checkoutBtn }) {
   const res = await fetch('/api/cart/', { credentials: 'include' })
 
   if (!res.ok) {
+    window.location.href = '/'
     checkoutBtn.disabled = true
     checkoutBtn.classList.add('disabled')
     userMessage.innerHTML = 'Please <a href="login.html">log in</a>.'

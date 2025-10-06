@@ -18,4 +18,4 @@ export async function getCurrentUser(req, res) {
     console.error('getCurrentUser error:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
-}
+} 
