@@ -4,11 +4,13 @@ export function addBtnListeners() {
       const albumId = event.currentTarget.dataset.id
 
       try {
+        // Get userId from localStorage (assumes it is stored after login)
+        const userId = localStorage.getItem('userId');
         const res = await fetch('/api/cart/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ productId: albumId })
+          body: JSON.stringify({ productId: albumId, userId })
         })
 
         if (!res.ok) {
