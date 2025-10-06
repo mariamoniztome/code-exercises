@@ -9,7 +9,7 @@ export async function addToCart(req, res) {
   return res.status(400).json({ error: 'Invalid product ID'})
  }
 
- const userId = req.body.userId
+ const userId = req.session.userId
 
  const existing = await db.get('SELECT * FROM cart_items WHERE user_id = ? AND product_id = ?', [userId, productId])
 
@@ -22,3 +22,12 @@ export async function addToCart(req, res) {
  res.json({ message: 'Added to cart' })
 
 }
+
+export async function getCartCount(req, res) {
+  const db = await getDBConnection()
+
+  const result = await db.get(`SELECT SUM(quantity) AS totalItems FROM cart_items WHERE user_id = ?`, [req.session.userId])
+
+  res.json({ totalItems: result.totalItems || 0 })
+  
+}  
