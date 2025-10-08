@@ -4,6 +4,8 @@ const http = require("http");
 
 const httpServer = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+  // res.statusCode = 200;
+  // res.setHeader('Content-Type', 'text/plain');
   res.end("Hello world");
 });
 
