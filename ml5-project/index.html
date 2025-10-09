@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Body as Brush - Interactive Painting</title>
+
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+
+    <!-- ml5.js library for PoseNet -->
+    <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="public/style.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- Control Panel -->
+      <div id="controls">
+        <h1>Body as Brush</h1>
+
+        <div class="control-group">
+          <label>Tool:</label>
+          <div class="tool-buttons">
+            <button id="pencilBtn" class="tool-btn active" title="Pencil">Pencil</button>
+            <button id="eraserBtn" class="tool-btn" title="Eraser">Eraser</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="colorPicker">Color:</label>
+          <input type="color" id="colorPicker" value="#ff0000">
+        </div>
+
+        <div class="control-group">
+          <label for="brushSize">Brush Size: <span id="sizeValue">10</span>px</label>
+          <input type="range" id="brushSize" min="1" max="50" value="10">
+        </div>
+
+        <div class="control-group">
+          <button id="clearBtn" class="action-btn">Clear</button>
+        </div>
+
+        <div id="status" class="status">
+          <div class="loading">Loading PoseNet...</div>
+        </div>
+      </div>
+
+      <!-- Small webcam preview (optional) -->
+      <div id="videoPreview"></div>
+    </div>
+
+    <!-- Main script -->
+    <script src="public/script.js"></script>
+  </body>
+</html>
