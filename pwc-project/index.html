@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAD Solar System — 10 Years in Orbit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/addons/p5.sound.min.js"></script>
+<script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;overflow:hidden;background:#000}
+#canvas-container{width:100vw;height:100vh;position:relative}
+.overlay{position:absolute;color:#fff;pointer-events:none;z-index:10}
+.overlay button,.overlay .clickable{pointer-events:auto;cursor:pointer}
+#title{top:20px;left:20px;font-size:24px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+#status{top:20px;right:20px;display:flex;gap:8px}
+.pill{background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:12px;font-size:11px;backdrop-filter:blur(4px)}
+#controls{bottom:20px;left:20px;font-size:13px;opacity:0.8;max-width:400px;text-shadow:0 1px 4px rgba(0,0,0,0.9)}
+#legend{bottom:20px;right:20px;font-size:12px;max-height:50vh;overflow-y:auto}
+.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.color-chip{width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,0.3)}
+#planet-title{top:80px;left:50%;transform:translateX(-50%);font-size:32px;font-weight:700;text-align:center;display:none;text-shadow:0 2px 12px rgba(0,0,0,0.9)}
+#back-btn{top:120px;left:50%;transform:translateX(-50%);display:none;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:8px 24px;border-radius:20px;font-size:14px;backdrop-filter:blur(8px);transition:background 0.2s}
+#back-btn:hover{background:rgba(255,255,255,0.3)}
+#help-panel{top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);padding:24px;border-radius:12px;max-width:500px;display:none;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2)}
+#help-panel h3{margin-bottom:12px}
+#help-panel ul{margin-left:20px;line-height:1.6}
+.toggle-btn{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;margin-left:8px}
+.toggle-btn.active{background:rgba(100,200,100,0.4)}
+</style>
+</head>
+<body>
+<div id="canvas-container"></div>
+<div class="overlay" id="title">MAD Solar System — 10 Years in Orbit</div>
+<div class="overlay" id="status">
+<div class="pill" id="mic-status">MIC: off</div>
+<div class="pill" id="cam-status">CAM: off</div>
+<div class="pill" id="fps-status">FPS: 0</div>
+<button class="toggle-btn" id="mic-toggle">Mic</button>
+<button class="toggle-btn" id="cam-toggle">Cam</button>
+<button class="toggle-btn" id="perf-toggle">Perf</button>
+</div>
+<div class="overlay" id="controls">Drag: orbit • Wheel: zoom • Click: enter • ESC/Back: return • H: help</div>
+<div class="overlay" id="legend"></div>
+<div class="overlay" id="planet-title"></div>
+<button class="overlay" id="back-btn">Back</button>
+<div class="overlay clickable" id="help-panel">
+<h3>Controls & Interactions</h3>
+<ul>
+<li>Drag mouse to orbit camera around the system</li>
+<li>Mouse wheel to zoom in/out</li>
+<li>Click on a planet to enter its micro-world</li>
+<li>ESC or Back button to return to system view</li>
+<li>Enable Mic for audio-reactive effects</li>
+<li>Enable Cam for pose-based camera control</li>
+<li>Perf toggle for low-performance mode</li>
+</ul>
+</div>
+<script>
+const PLANETS=[
+{label:"2025 — O Maravilhoso Grotesco",baseColor:[350,70,60],radius:45,orbitRadius:400,orbitSpeed:0.0003,materialMode:'noise',themeId:'grotesque',angle:0},
+{label:"2024 — Limited Space",baseColor:[200,65,55],radius:40,orbitRadius:500,orbitSpeed:0.00025,materialMode:'standard',themeId:'limited',angle:0.5},
+{label:"2023 — Being Bad is Fun",baseColor:[30,80,60],radius:42,orbitRadius:600,orbitSpeed:0.0002,materialMode:'striped',themeId:'badfun',angle:1.2},
+{label:"2022 — À noite tudo muda",baseColor:[240,50,40],radius:38,orbitRadius:700,orbitSpeed:0.00018,materialMode:'glow',themeId:'noite',angle:2.1},
+{label:"2021 — Déjà vu",baseColor:[280,60,55],radius:43,orbitRadius:800,orbitSpeed:0.00015,materialMode:'noise',themeId:'dejavu',angle:3.0},
+{label:"2020 — Mythology",baseColor:[50,70,58],radius:41,orbitRadius:900,orbitSpeed:0.00013,materialMode:'standard',themeId:'myth',angle:4.0},
+{label:"2019 — Unknown",baseColor:[180,55,50],radius:39,orbitRadius:1000,orbitSpeed:0.00012,materialMode:'noise',themeId:'unknown',angle:5.0},
+{label:"2018 — Unknown",baseColor:[150,60,52],radius:37,orbitRadius:1100,orbitSpeed:0.00011,materialMode:'glow',themeId:'unknown',angle:0.8},
+{label:"2017 — Unknown",baseColor:[300,65,53],radius:36,orbitRadius:1200,orbitSpeed:0.0001,materialMode:'striped',themeId:'unknown',angle:1.5},
+{label:"2016 — Genesis",baseColor:[120,75,55],radius:44,orbitRadius:1300,orbitSpeed:0.00009,materialMode:'noise',themeId:'genesis',angle:2.5}
+];
+
+let cam,stars,sceneState='system',activePlanetIdx=-1,transitionProgress=0;
+let micOn=false,camOn=false,lowPerf=false,helpVisible=false;
+let audioInput,amplitude,soundClassifier,soundReady=false,soundLevel=0;
+let video,poseNet,poses=[],poseReady=false,poseOffset=0;
+let hoverIdx=-1;
+let camYaw=0,camPitch=0.3,camDist=2000,targetYaw=0,targetPitch=0.3,targetDist=2000;
+let pmouseXstart,pmouseYstart,dragging=false;
+let sunGlow,orbitGraphics=[];
+let planetEchoFrames=[];
+let genesisParticles=[];
+let fireflies=[];
+let cubeWalls=150;
+
+function setup(){
+let canvas=createCanvas(windowWidth,windowHeight,WEBGL);
+canvas.parent('canvas-container');
+perspective(PI/3,width/height,10,10000);
+initStars();
+initPlanets();
+initUI();
+}
+
+function initStars(){
+stars=createGraphics(width,height);
+stars.background(0);
+randomSeed(42);
+for(let i=0;i<800;i++){
+let x=random(width);
+let y=random(height);
+let br=random(100,255);
+stars.stroke(br);
+stars.strokeWeight(random(1,2));
+stars.point(x,y);
+}
+randomSeed(millis());
+}
+
+function initPlanets(){
+for(let i=0;i<PLANETS.length;i++){
+randomSeed(i*100);
+noiseSeed(i*100);
+PLANETS[i].noiseOffset=random(1000);
+let og=createGraphics(200,200);
+og.noFill();
+og.stroke(255,255,255,30);
+og.strokeWeight(1);
+og.translate(100,100);
+og.ellipse(0,0,PLANETS[i].orbitRadius*2*0.15,PLANETS[i].orbitRadius*2*0.15);
+orbitGraphics.push(og);
+planetEchoFrames.push([]);
+}
+randomSeed(millis());
+}
+
+function initUI(){
+let legend=select('#legend');
+for(let p of PLANETS){
+let item=createDiv('');
+item.class('legend-item');
+let chip=createDiv('');
+chip.class('color-chip');
+chip.style('background',`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+chip.parent(item);
+let lbl=createDiv(p.label);
+lbl.style('font-size','11px');
+lbl.parent(item);
+item.parent(legend);
+}
+select('#back-btn').mousePressed(exitPlanet);
+select('#mic-toggle').mousePressed(toggleMic);
+select('#cam-toggle').mousePressed(toggleCam);
+select('#perf-toggle').mousePressed(()=>{lowPerf=!lowPerf;select('#perf-toggle').toggleClass('active')});
+select('#help-panel').mousePressed(()=>{helpVisible=false;select('#help-panel').style('display','none')});
+}
+
+function draw(){
+  background(0);
+  
+  // draw star background in screen space
+  push();
+  resetMatrix(); // ignore camera transform
+  translate(-width/2, -height/2, 0);
+  image(stars, 0, 0);
+  pop();
+  
+  // then apply camera and draw 3D scene
+  applyCamera();
+ambientLight(40);
+pointLight(255,230,200,0,0,0);
+if(sceneState==='system'){
+drawSystemView();
+}else if(sceneState==='transitionToPlanet'){
+transitionProgress+=deltaTime*0.001;
+if(transitionProgress>=1){sceneState='planet';transitionProgress=0}
+drawSystemView();
+}else if(sceneState==='planet'){
+drawPlanetView();
+}else if(sceneState==='transitionToSystem'){
+transitionProgress+=deltaTime*0.001;
+if(transitionProgress>=1){sceneState='system';transitionProgress=0;activePlanetIdx=-1;select('#planet-title').style('display','none');select('#back-btn').style('display','none')}
+drawSystemView();
+}
+updateAudio();
+updatePose();
+select('#fps-status').html('FPS: '+floor(frameRate()));
+}
+
+function drawSystemView(){
+push();
+ambientMaterial(255,240,200);
+emissiveMaterial(255,220,150);
+sphere(80);
+pop();
+for(let i=0;i<PLANETS.length;i++){
+let p=PLANETS[i];
+p.angle+=p.orbitSpeed*deltaTime;
+let x=cos(p.angle)*p.orbitRadius;
+let z=sin(p.angle)*p.orbitRadius;
+let y=sin(p.angle*2+i)*50;
+push();
+translate(0,0,0);
+rotateX(PI/2);
+noFill();
+stroke(255,255,255,20);
+strokeWeight(1);
+ellipse(0,0,p.orbitRadius*2,p.orbitRadius*2);
+pop();
+push();
+translate(x,y,z);
+if(hoverIdx===i){
+push();
+noFill();
+stroke(255,255,100,150);
+strokeWeight(2);
+sphere(p.radius+10);
+pop();
+}
+drawPlanetSphere(p,i);
+pop();
+let screenPos=getScreenPosition(x,y,z);
+if(screenPos&&dist(mouseX,mouseY,screenPos.x,screenPos.y)<p.radius*0.5){
+hoverIdx=i;
+}
+}
+}
+
+function drawPlanetSphere(p,idx){
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+if(p.materialMode==='standard'){
+ambientMaterial(c);
+sphere(p.radius);
+}else if(p.materialMode==='noise'){
+ambientMaterial(c);
+let detail=lowPerf?8:12;
+let vertices=[];
+for(let i=0;i<=detail;i++){
+for(let j=0;j<=detail;j++){
+let theta=map(i,0,detail,0,PI);
+let phi=map(j,0,detail,0,TWO_PI);
+let r=p.radius+noise(p.noiseOffset+i*0.3,j*0.3,millis()*0.0001)*8;
+let vx=r*sin(theta)*cos(phi);
+let vy=r*cos(theta);
+let vz=r*sin(theta)*sin(phi);
+vertices.push(createVector(vx,vy,vz));
+}
+}
+noStroke();
+fill(c);
+beginShape(TRIANGLES);
+for(let i=0;i<detail;i++){
+for(let j=0;j<detail;j++){
+let a=vertices[i*(detail+1)+j];
+let b=vertices[i*(detail+1)+j+1];
+let c=vertices[(i+1)*(detail+1)+j];
+let d=vertices[(i+1)*(detail+1)+j+1];
+vertex(a.x,a.y,a.z);vertex(b.x,b.y,b.z);vertex(c.x,c.y,c.z);
+vertex(b.x,b.y,b.z);vertex(d.x,d.y,d.z);vertex(c.x,c.y,c.z);
+}
+}
+endShape();
+}else if(p.materialMode==='striped'){
+ambientMaterial(c);
+push();
+rotateY(millis()*0.0003);
+for(let i=0;i<10;i++){
+push();
+rotateY(i*TWO_PI/10);
+translate(0,0,p.radius);
+fill(255,255,255,30);
+noStroke();
+box(2,p.radius*2,p.radius*2);
+pop();
+}
+pop();
+sphere(p.radius*0.9);
+}else if(p.materialMode==='glow'){
+ambientMaterial(c);
+emissiveMaterial(red(c)*0.3,green(c)*0.3,blue(c)*0.3);
+sphere(p.radius);
+}
+}
+
+function drawPlanetView(){
+let p=PLANETS[activePlanetIdx];
+let px=cos(p.angle)*p.orbitRadius;
+let pz=sin(p.angle)*p.orbitRadius;
+let py=sin(p.angle*2+activePlanetIdx)*50;
+push();
+translate(px,py,pz);
+rotateY(millis()*0.0002);
+applyThemeEffects(p,activePlanetIdx);
+pop();
+}
+
+function applyThemeEffects(p,idx){
+if(p.themeId==='grotesque'){
+let distort=soundLevel*20;
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+let detail=lowPerf?10:16;
+let vertices=[];
+for(let i=0;i<=detail;i++){
+for(let j=0;j<=detail;j++){
+let theta=map(i,0,detail,0,PI);
+let phi=map(j,0,detail,0,TWO_PI);
+let wobble=noise(p.noiseOffset+i*0.2,j*0.2,millis()*0.0003)*15+distort*sin(phi*3);
+let r=p.radius+wobble;
+let vx=r*sin(theta)*cos(phi);
+let vy=r*cos(theta);
+let vz=r*sin(theta)*sin(phi);
+vertices.push(createVector(vx,vy,vz));
+}
+}
+noStroke();
+fill(c);
+beginShape(TRIANGLES);
+for(let i=0;i<detail;i++){
+for(let j=0;j<detail;j++){
+let a=vertices[i*(detail+1)+j];
+let b=vertices[i*(detail+1)+j+1];
+let cc=vertices[(i+1)*(detail+1)+j];
+let d=vertices[(i+1)*(detail+1)+j+1];
+vertex(a.x,a.y,a.z);vertex(b.x,b.y,b.z);vertex(cc.x,cc.y,cc.z);
+vertex(b.x,b.y,b.z);vertex(d.x,d.y,d.z);vertex(cc.x,cc.y,cc.z);
+}
+}
+endShape();
+}else if(p.themeId==='limited'){
+cubeWalls=lerp(cubeWalls,150-poseOffset*100,0.05);
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius);
+push();
+noFill();
+stroke(255,100);
+strokeWeight(1);
+box(cubeWalls);
+pop();
+}else if(p.themeId==='badfun'){
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius);
+if(soundLevel>0.3&&!lowPerf){
+for(let i=0;i<5;i++){
+push();
+translate(random(-100,100),random(-100,100),random(-100,100));
+fill(255,random(100,255),0,150);
+noStroke();
+sphere(random(5,15));
+pop();
+}
+}
+}else if(p.themeId==='noite'){
+ambientLight(10);
+let sweep=sin(millis()*0.001)*PI;
+push();
+rotateY(sweep);
+pointLight(200,200,255,p.radius*2,0,0);
+pop();
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius);
+if(!lowPerf){
+if(frameCount%30===0&&soundLevel>0.15){
+fireflies.push({x:random(-150,150),y:random(-150,150),z:random(-150,150),life:60});
+}
+for(let i=fireflies.length-1;i>=0;i--){
+let f=fireflies[i];
+f.life--;
+if(f.life<=0)fireflies.splice(i,1);
+else{
+push();
+translate(f.x,f.y+soundLevel*30,f.z);
+fill(255,255,100,map(f.life,0,60,0,200));
+noStroke();
+sphere(3);
+pop();
+}
+}
+}
+}else if(p.themeId==='dejavu'){
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius);
+if(!lowPerf){
+if(frameCount%5===0){
+planetEchoFrames[idx].push({angle:millis()*0.0002,alpha:150});
+if(planetEchoFrames[idx].length>8)planetEchoFrames[idx].shift();
+}
+for(let e of planetEchoFrames[idx]){
+e.alpha-=2;
+push();
+rotateY(e.angle);
+fill(red(c),green(c),blue(c),e.alpha);
+noStroke();
+sphere(p.radius*1.05);
+pop();
+}
+}
+}else if(p.themeId==='myth'){
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius);
+push();
+let bright=50+soundLevel*100;
+fill(255,255,200,bright);
+noStroke();
+rotateY(millis()*0.0001);
+for(let i=0;i<6;i++){
+push();
+rotateZ(i*TWO_PI/6);
+translate(0,p.radius*0.7,0);
+ellipse(0,0,10,30);
+pop();
+}
+pop();
+}else if(p.themeId==='genesis'){
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+sphere(p.radius*0.5);
+if(genesisParticles.length<200){
+for(let i=0;i<5;i++){
+genesisParticles.push({x:random(-200,200),y:random(-200,200),z:random(-200,200),vx:0,vy:0,vz:0});
+}
+}
+let accel=0.01+soundLevel*0.05;
+for(let pt of genesisParticles){
+let dx=-pt.x;let dy=-pt.y;let dz=-pt.z;
+let d=sqrt(dx*dx+dy*dy+dz*dz)+0.1;
+pt.vx+=dx/d*accel;pt.vy+=dy/d*accel;pt.vz+=dz/d*accel;
+pt.x+=pt.vx;pt.y+=pt.vy;pt.z+=pt.vz;
+if(d<p.radius){pt.x=random(-200,200);pt.y=random(-200,200);pt.z=random(-200,200);pt.vx=0;pt.vy=0;pt.vz=0}
+push();
+translate(pt.x,pt.y,pt.z);
+fill(c);
+noStroke();
+sphere(2);
+pop();
+}
+}else{
+let c=color(`hsl(${p.baseColor[0]},${p.baseColor[1]}%,${p.baseColor[2]}%)`);
+ambientMaterial(c);
+push();
+rotateY(millis()*0.0003+poseOffset);
+sphere(p.radius);
+pop();
+}
+}
+
+function updateCamera(){
+if(sceneState==='transitionToPlanet'){
+let p=PLANETS[activePlanetIdx];
+let tx=cos(p.angle)*p.orbitRadius;
+let tz=sin(p.angle)*p.orbitRadius;
+let ty=sin(p.angle*2+activePlanetIdx)*50;
+targetDist=p.radius*4;
+targetYaw=atan2(tz,tx);
+targetPitch=0;
+camDist=lerp(camDist,targetDist,0.05);
+camYaw=lerp(camYaw,targetYaw,0.05);
+camPitch=lerp(camPitch,targetPitch,0.05);
+}else if(sceneState==='planet'){
+let p=PLANETS[activePlanetIdx];
+targetDist=p.radius*3.5;
+camYaw+=0.003;
+camDist=lerp(camDist,targetDist,0.03);
+}else if(sceneState==='transitionToSystem'){
+targetDist=2000;
+targetPitch=0.3;
+camDist=lerp(camDist,targetDist,0.05);
+camPitch=lerp(camPitch,targetPitch,0.05);
+}else{
+camDist=constrain(camDist,500,3500);
+camPitch=constrain(camPitch,-HALF_PI+0.1,HALF_PI-0.1);
+}
+}
+
+function applyCamera(){
+let ex=camDist*cos(camPitch)*cos(camYaw);
+let ey=camDist*sin(camPitch);
+let ez=camDist*cos(camPitch)*sin(camYaw);
+camera(ex,ey,ez,0,0,0,0,1,0);
+}
+
+function mousePressed(){
+pmouseXstart=mouseX;
+pmouseYstart=mouseY;
+dragging=true;
+if(sceneState==='system'&&hoverIdx>=0){
+activePlanetIdx=hoverIdx;
+sceneState='transitionToPlanet';
+transitionProgress=0;
+select('#planet-title').html(PLANETS[activePlanetIdx].label);
+select('#planet-title').style('display','block');
+select('#back-btn').style('display','block');
+}
+}
+
+function mouseDragged(){
+if(dragging&&(sceneState==='system'||sceneState==='transitionToSystem')){
+let dx=mouseX-pmouseX;
+let dy=mouseY-pmouseY;
+camYaw+=dx*0.005;
+camPitch-=dy*0.005;
+}
+}
+
+function mouseReleased(){
+dragging=false;
+hoverIdx=-1;
+}
+
+function mouseWheel(event){
+if(sceneState==='system'||sceneState==='transitionToSystem'){
+camDist+=event.delta*0.5;
+}
+return false;
+}
+
+function keyPressed(){
+if(key==='Escape'){
+if(sceneState==='planet'){
+exitPlanet();
+}
+}
+if(key==='h'||key==='H'){
+helpVisible=!helpVisible;
+select('#help-panel').style('display',helpVisible?'block':'none');
+}
+}
+
+function exitPlanet(){
+if(sceneState==='planet'){
+sceneState='transitionToSystem';
+transitionProgress=0;
+planetEchoFrames[activePlanetIdx]=[];
+fireflies=[];
+genesisParticles=[];
+cubeWalls=150;
+}
+}
+
+function toggleMic(){
+if(!micOn){
+getAudioContext().resume();
+audioInput=new p5.AudioIn();
+audioInput.start(()=>{
+amplitude=new p5.Amplitude();
+amplitude.setInput(audioInput);
+micOn=true;
+select('#mic-status').html('MIC: on');
+select('#mic-toggle').addClass('active');
+soundReady=true;
+});
+}else{
+if(audioInput)audioInput.stop();
+micOn=false;
+soundReady=false;
+select('#mic-status').html('MIC: off');
+select('#mic-toggle').removeClass('active');
+}
+}
+
+function toggleCam(){
+if(!camOn){
+video=createCapture(VIDEO,()=>{
+video.size(320,240);
+video.hide();
+poseNet=ml5.poseNet(video,()=>{
+poseNet.on('pose',(results)=>{poses=results});
+camOn=true;
+poseReady=true;
+select('#cam-status').html('CAM: on');
+select('#cam-toggle').addClass('active');
+});
+});
+}else{
+if(video)video.remove();
+camOn=false;
+poseReady=false;
+select('#cam-status').html('CAM: off');
+select('#cam-toggle').removeClass('active');
+}
+}
+
+function updateAudio(){
+if(soundReady&&amplitude){
+soundLevel=amplitude.getLevel();
+}else{
+soundLevel*=0.9;
+}
+}
+
+function updatePose(){
+if(poseReady&&poses.length>0){
+let pose=poses[0].pose;
+if(pose.nose){
+let xOff=map(pose.nose.x,0,320,-1,1);
+poseOffset=xOff*0.3;
+if(sceneState==='system'){
+camYaw+=poseOffset*0.01;
+}
+}
+}else{
+poseOffset*=0.95;
+}
+}
+
+function getScreenPosition(x,y,z){
+let pos=createVector(x,y,z);
+let cam=this._renderer._curCamera;
+let modelview=cam.cameraMatrix;
+let projection=cam.projMatrix;
+let viewport=[0,0,width,height];
+let transformed=multiplyMatrixVector(modelview.mat4,pos);
+let projected=multiplyMatrixVector(projection.mat4,transformed);
+if(projected.z===0)return null;
+let ndcX=projected.x/projected.z;
+let ndcY=projected.y/projected.z;
+let screenX=(ndcX+1)*0.5*width;
+let screenY=(1-ndcY)*0.5*height;
+return createVector(screenX,screenY);
+}
+
+function multiplyMatrixVector(mat,vec){
+let x=vec.x||0,y=vec.y||0,z=vec.z||0,w=1;
+let rx=mat[0]*x+mat[4]*y+mat[8]*z+mat[12]*w;
+let ry=mat[1]*x+mat[5]*y+mat[9]*z+mat[13]*w;
+let rz=mat[2]*x+mat[6]*y+mat[10]*z+mat[14]*w;
+let rw=mat[3]*x+mat[7]*y+mat[11]*z+mat[15]*w;
+return{x:rx,y:ry,z:rz,w:rw};
+}
+
+function windowResized(){
+resizeCanvas(windowWidth,windowHeight);
+initStars();
+}
+</script>
+</body>
+</html>
