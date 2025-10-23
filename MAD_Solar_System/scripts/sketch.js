@@ -277,8 +277,8 @@ function draw() {
 
   // luzes
   ambientLight(60);
-  directionalLight(255, 255, 255, 0.6, -1, -0.2);
-
+directionalLight(255, 255, 255, -0.3, 1, 0.1);
+  
   // sol - ESCONDER no zoom
   if (!isZoomedIn) {
     push();
