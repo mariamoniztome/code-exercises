@@ -113,7 +113,7 @@ function draw() {
 
     targetX = px;
     targetY = 0;
-    targetZ = pz + selectedPlanet.radius * 1.5 + 80;
+    targetZ = pz + selectedPlanet.radius * 2 + 200;
   }
 
   // movimento suave da câmara
