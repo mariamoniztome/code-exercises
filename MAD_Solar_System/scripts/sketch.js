@@ -537,6 +537,30 @@ function draw() {
       globalColorTint = color(r, g, b);
     }
   }
+
+  // === HUD (debug visual no ecrã) ===
+push();
+resetMatrix();
+translate(-width / 2 + 20, -height / 2 + 30);
+fill(255);
+textSize(14);
+textAlign(LEFT, TOP);
+text(
+  `🎥 Camera Target: (${targetX.toFixed(1)}, ${targetY.toFixed(1)}, ${targetZ.toFixed(1)})\n` +
+  `💡 Brightness: ${globalBrightness.toFixed(2)}\n` +
+  (globalColorTint ? `🎨 Tint: R${red(globalColorTint).toFixed(0)} G${green(globalColorTint).toFixed(0)} B${blue(globalColorTint).toFixed(0)}` : "🎨 Tint: none"),
+  0, 0
+);
+pop();
+// Mostrar o feed da webcam no canto
+push();
+resetMatrix();
+translate(-width / 2 + 20, -height / 2 + 20);
+noStroke();
+texture(video);
+rect(0, 0, 160, 120);
+pop();
+
 }
 
 function mousePressed() {
@@ -689,7 +713,7 @@ function setupFaceApi() {
   console.log("😊 A inicializar Face API...");
   video = createCapture(VIDEO);
   video.size(640, 480);
-  video.hide();
+  // video.hide();
   faceApi = ml5.faceApi(
     video,
     { withLandmarks: true, withDescriptors: false },
@@ -716,7 +740,7 @@ function gotFace(error, result) {
   detections = result;
   const expressions = result[0].expressions;
 
-  // Find dominant emotion
+  // Encontra emoção dominante
   let maxEmotion = "";
   let maxValue = 0;
   for (let emotion in expressions) {
@@ -726,26 +750,40 @@ function gotFace(error, result) {
     }
   }
 
-  // Change atmosphere based on emotion
+  // Mostra no log todas as expressões
+  console.table(expressions);
+
+  // Só reage a emoções fortes
   if (maxValue > 0.7) {
-    console.log(`😊 Emoção detetada: ${maxEmotion} (${(maxValue * 100).toFixed(0)}%)`);
-    
+    console.log(
+      `😊 Emoção dominante: %c${maxEmotion}`,
+      "color: yellow; font-weight: bold",
+      `(${(maxValue * 100).toFixed(1)}%)`
+    );
+
     switch (maxEmotion) {
       case "happy":
         globalBrightness = 1.8;
         globalColorTint = color(255, 255, 200);
+        console.log("🌞 Face → Feliz → brilho alto, tons amarelos");
         break;
       case "sad":
         globalBrightness = 0.4;
         globalColorTint = color(100, 100, 150);
+        console.log("🌧️ Face → Triste → brilho baixo, tons azulados");
         break;
       case "angry":
         globalBrightness = 1.2;
         globalColorTint = color(255, 100, 100);
+        console.log("🔥 Face → Zangado → brilho médio, tons vermelhos");
         break;
       case "surprised":
         globalBrightness = 2.0;
         globalColorTint = color(255, 255, 255);
+        console.log("⚡ Face → Surpreso → brilho máximo, branco total");
+        break;
+      default:
+        console.log("😐 Emoção neutra — sem alterações.");
         break;
     }
   }
@@ -774,14 +812,23 @@ function gotPoses(results) {
   poses = results;
 
   const nose = results[0].pose.nose;
+  const confidence = results[0].pose.keypoints.find(k => k.part === "nose")?.score || 0;
 
-  // Map nose position to camera rotation
-  const noseX = map(nose.x, 0, 640, -200, 200);
-  const noseY = map(nose.y, 0, 480, -200, 200);
+  // Só loga se for uma deteção confiável
+  if (confidence > 0.5) {
+    const noseX = map(nose.x, 0, 640, -200, 200);
+    const noseY = map(nose.y, 0, 480, -200, 200);
 
-  // Move camera smoothly when not zoomed
-  if (!isZoomedIn) {
-    targetX = lerp(targetX, noseX, 0.05);
-    targetY = lerp(targetY, noseY - 800, 0.05);
+    // console.log(
+    //   `👃 Nariz: x=${nose.x.toFixed(1)}, y=${nose.y.toFixed(1)} → targetX=${noseX.toFixed(1)}, targetY=${(noseY - 800).toFixed(1)}`
+    // );
+
+if (!isZoomedIn) {
+  targetX = noseX;
+  targetY = noseY - 800; 
+}
+
+  } else {
+    console.warn("⚠️ PoseNet: nariz não detetado com confiança suficiente.");
   }
 }
