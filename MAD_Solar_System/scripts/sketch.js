@@ -3,6 +3,7 @@ let spaceSound;
 let volume = 0.5;
 let soundEnabled = true;
 let zoomFactor = 900; // valor inicial da câmara
+let soundButton;
 
 // Estrelas
 let stars = [];
@@ -43,6 +44,10 @@ function setup() {
     spaceSound.loop(); // toca em loop
     spaceSound.setVolume(volume);
   });
+
+  // botão de som
+  soundButton = document.getElementById("sound-toggle");
+  soundButton.addEventListener("click", toggleSound);
 }
 
 function draw() {
@@ -131,4 +136,16 @@ function windowResized() {
 function mouseWheel(event) {
   zoomFactor += event.delta * 0.5; // roda para zoom in/out
   zoomFactor = constrain(zoomFactor, 400, 2500); // limitar zoom
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+
+  if (soundEnabled) {
+    spaceSound.setVolume(0.5);
+    soundButton.textContent = "🔊";
+  } else {
+    spaceSound.setVolume(0);
+    soundButton.textContent = "🔇";
+  }
 }
