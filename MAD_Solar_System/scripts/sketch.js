@@ -21,6 +21,7 @@ const NUM_PLANETS = 10;
 let selectedPlanet = null;
 let hoveredPlanet = null;
 let isZoomedIn = false;
+let isPaused = false;
 
 // Câmara
 let camX = 0,
@@ -31,6 +32,64 @@ let targetX = 0,
   targetZ = 2000;
 
 let planetTextures = [];
+
+// Basic planet info for the UI (titles + descriptions)
+const planetInfos = [
+  { title: 'Lava World', desc: 'A glowing planet of molten rock and fierce energy.' },
+  { title: 'Ringed Giant', desc: 'A majestic world with colorful rings.' },
+  { title: 'Rainbow Orb', desc: 'A shimmering planet with many tiny moons.' },
+  { title: 'Crystal Spire', desc: 'Prismatic crystals float around this world.' },
+  { title: 'Blue Ocean', desc: 'Vast seas with glowing waves and foam.' },
+  { title: 'Electric Planet', desc: 'Sparks and lightning dance across the surface.' },
+  { title: 'Nebula Core', desc: 'A cloudy planet veiled in gas and soft light.' },
+  { title: 'Psychedelia', desc: 'A world of swirling psychedelic colors.' },
+  { title: 'Shadow', desc: 'Dark landscapes and subtle mysterious glows.' },
+  { title: 'Fragmented', desc: 'Broken shards orbit a shrunken core.' },
+];
+
+function selectPlanetByIndex(idx) {
+  if (idx < 0 || idx >= planets.length) return;
+
+  const p = planets[idx];
+
+  // If already zoomed to this planet, toggle off
+  if (isZoomedIn && selectedPlanet === p) {
+    unselectPlanet();
+    return;
+  }
+
+  selectedPlanet = p;
+  isZoomedIn = true;
+
+  // Compute immediate target so camera lerps toward it
+  const px = cos(p.angle) * p.orbitRadius;
+  const pz = sin(p.angle) * p.orbitRadius;
+  targetX = px;
+  targetY = 0;
+  targetZ = pz + p.radius * 2 + 200;
+
+  showPlanetInfo(p);
+  updatePlanetListSelection(idx);
+}
+
+function unselectPlanet() {
+  selectedPlanet = null;
+  isZoomedIn = false;
+  targetX = 0;
+  targetY = -800;
+  targetZ = 2000;
+  hidePlanetInfo();
+  updatePlanetListSelection(-1);
+}
+
+function updatePlanetListSelection(selectedIdx) {
+  const items = document.querySelectorAll('.planet-item');
+  items.forEach((btn) => {
+    const idx = parseInt(btn.getAttribute('data-index'));
+    if (idx === selectedIdx) btn.classList.add('selected');
+    else btn.classList.remove('selected');
+  });
+}
 
 function preload() {
   spaceSound = loadSound("assets/sounds/space.mp3");
@@ -103,10 +162,49 @@ function setup() {
   // botão de som
   soundButton = document.getElementById("sound-toggle");
   soundButton.addEventListener("click", toggleSound);
+
+  // Planet list buttons wiring
+  const items = document.querySelectorAll('.planet-item');
+  items.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(btn.getAttribute('data-index'));
+      selectPlanetByIndex(idx);
+    });
+  });
+
+  // Keyboard shortcuts
+  window.addEventListener('keydown', (e) => {
+    // If focus is on an input or textarea, ignore
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    if (e.key === 'Escape') {
+      // Exit zoom
+      if (isZoomedIn) unselectPlanet();
+    } else if (e.code === 'Space') {
+      // Toggle pause
+      isPaused = !isPaused;
+      e.preventDefault();
+    } else {
+      // Number keys 1-0 (0 maps to 10)
+      const num = parseInt(e.key);
+      if (!isNaN(num)) {
+        let idx = num - 1;
+        if (num === 0) idx = 9; // key '0' -> planet 10
+        if (idx >= 0 && idx < NUM_PLANETS) selectPlanetByIndex(idx);
+      }
+    }
+  });
 }
 
 function draw() {
-  background(11, 13, 20);
+  if (isPaused) {
+    // still render a faded background so UI remains visible
+    background(6, 7, 10);
+    // do not advance frameCount dependent updates
+  } else {
+    background(11, 13, 20);
+  }
 
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
@@ -192,7 +290,7 @@ function draw() {
 
   // planetas - mostrar APENAS o selecionado no zoom
   for (let p of planets) {
-    p.update();
+    if (!isPaused) p.update();
 
     if (isZoomedIn) {
       // No zoom: renderizar APENAS o planeta selecionado
@@ -468,8 +566,9 @@ function showPlanetInfo(planet) {
   const titleElement = document.getElementById("planet-title");
   const descElement = document.getElementById("planet-description");
 
-  titleElement.textContent = `MAD Jam Fest ${2025 - planet.type}`;
-  descElement.textContent = "Explora o universo da criatividade digital";
+  const info = planetInfos[planet.type] || {};
+  titleElement.textContent = info.title || `Planet ${planet.type + 1}`;
+  descElement.textContent = info.desc || "Explora o universo da criatividade digital";
 
   infoDiv.classList.remove("hidden");
 }

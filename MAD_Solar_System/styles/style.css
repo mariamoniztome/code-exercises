@@ -66,3 +66,58 @@ a:hover {
   color: #c8dcff;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
 }
+
+/* Shortcuts panel */
+#shortcuts {
+  position: fixed;
+  right: 12px;
+  top: 60px;
+  width: 220px;
+  background: rgba(10, 12, 20, 0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 12px;
+  color: #dfe8ff;
+  z-index: 120;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+#shortcuts h3 { margin: 0 0 6px 0; font-size: 15px }
+#shortcuts ul { margin: 0; padding-left: 18px }
+
+/* Planet list */
+#planet-list {
+  position: fixed;
+  left: 12px;
+  top: 60px;
+  width: 200px;
+  max-height: 70vh;
+  overflow: auto;
+  background: rgba(10, 12, 20, 0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px;
+  color: #dfe8ff;
+  z-index: 120;
+  border-radius: 8px;
+}
+
+.planet-items { display: flex; flex-direction: column; gap: 6px; margin-top: 8px }
+.planet-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #dfe8ff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+.planet-item:hover { background: rgba(255,255,255,0.08) }
+
+.planet-item.selected {
+  background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(120,160,255,0.06));
+  border-color: rgba(120,160,255,0.2);
+  box-shadow: 0 3px 10px rgba(80,120,220,0.06) inset;
+}
+
+/* When planet-info is visible, allow clicks on it (so links/buttons could be placed) */
+.planet-info:not(.hidden) { pointer-events: auto }
