@@ -13,40 +13,62 @@
   </head>
   <body>
     <script src="scripts/sketch.js"></script>
-    <div id="sound-toggle">🔊</div>
-    <!-- Overlay de informação do planeta -->
-    <div id="planet-info" class="planet-info hidden">
-      <h1 id="planet-title">Festival MAD 2025</h1>
-      <p id="planet-description">Explora o universo da criatividade digital</p>
-    </div>
-    <!-- Shortcuts help panel -->
-    <div id="shortcuts" class="shortcuts">
-      <h3>Shortcuts</h3>
-      <ul>
-        <li><strong>1-0</strong>: Select planet 1–10</li>
-        <li><strong>Esc</strong>: Exit zoom / deselect</li>
-        <li><strong>Space</strong>: Toggle pause animation</li>
-        <li><strong>Mouse</strong>: Hover to highlight, Click to zoom</li>
-        <li><strong>Mouse Wheel</strong>: Zoom camera in/out when not focused</li>
-      </ul>
-    </div>
+    
+    <!-- Header Controls -->
+    <header class="header">
+      <div class="header-controls">
+        <button id="sound-toggle" class="control-btn" title="Toggle Sound">
+          <span class="icon">🔊</span>
+        </button>
+        <button id="help-toggle" class="control-btn" title="Show Shortcuts">
+          <span class="icon">?</span>
+        </button>
+      </div>
+    </header>
 
-    <!-- Planet list / clickable descriptions -->
-    <div id="planet-list" class="planet-list">
-      <h3>Planets</h3>
-      <div class="planet-items">
-        <!-- Items will match planet indices 0..9 -->
-        <button class="planet-item" data-index="0">1 • Lava</button>
-        <button class="planet-item" data-index="1">2 • Saturn-like</button>
-        <button class="planet-item" data-index="2">3 • Rainbow Moons</button>
-        <button class="planet-item" data-index="3">4 • Crystal</button>
-        <button class="planet-item" data-index="4">5 • Ocean</button>
-        <button class="planet-item" data-index="5">6 • Electric</button>
-        <button class="planet-item" data-index="6">7 • Nebula</button>
-        <button class="planet-item" data-index="7">8 • Psychedelic</button>
-        <button class="planet-item" data-index="8">9 • Shadow</button>
-        <button class="planet-item" data-index="9">10 • Fragmented</button>
+    <!-- Planet Info Overlay -->
+    <div id="planet-info" class="planet-info hidden">
+      <div class="info-content">
+        <h1 id="planet-title">Festival MAD 2025</h1>
+        <p id="planet-description">Explora o universo da criatividade digital</p>
       </div>
     </div>
+
+    <!-- Shortcuts Panel (toggle) -->
+    <div id="shortcuts" class="panel shortcuts-panel hidden">
+      <div class="panel-header">
+        <h3>Atalhos</h3>
+        <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')">×</button>
+      </div>
+      <div class="panel-content">
+        <div class="shortcut-item">
+          <kbd>1-0</kbd>
+          <span>Selecionar planeta 1–10</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Esc</kbd>
+          <span>Sair do zoom / desselecionar</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Space</kbd>
+          <span>Pausar animação</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Mouse</kbd>
+          <span>Hover para destacar, Click para zoom</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Wheel</kbd>
+          <span>Zoom da câmera</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Toggle shortcuts panel
+      document.getElementById('help-toggle').addEventListener('click', function() {
+        document.getElementById('shortcuts').classList.toggle('hidden');
+      });
+    </script>
   </body>
 </html>

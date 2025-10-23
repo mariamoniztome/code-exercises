@@ -1,123 +1,279 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
   height: 100%;
-  background: #0b0d14;
-  color: #cfd5ff;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #000000;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
 }
 
-a {
-  color: #b7c3ff;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
-
-#sound-toggle {
+.header {
   position: fixed;
-  top: 12px;
-  right: 12px;
-  font-size: 22px;
-  cursor: pointer;
-  user-select: none;
-  color: #cfd5ff;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  padding: 6px 10px;
-  transition: opacity 0.2s;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
-#sound-toggle:hover {
-  opacity: 0.7;
+.header-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12),
+              0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16),
+              0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.control-btn:active {
+  transform: scale(0.98);
+}
+
+.control-btn .icon {
+  display: block;
+  line-height: 1;
 }
 
 .planet-info {
   position: fixed;
-  top: 40px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  color: white;
-  font-family: 'Arial', sans-serif;
-  z-index: 100;
+  transform: translate(-50%, -50%);
+  z-index: 900;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .planet-info.hidden {
   opacity: 0;
+  transform: translate(-50%, -48%);
   pointer-events: none;
 }
 
+.info-content {
+  background: rgba(20, 20, 25, 0.6);
+  backdrop-filter: blur(60px) saturate(150%);
+  -webkit-backdrop-filter: blur(60px) saturate(150%);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 32px 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+              0 0 1px rgba(255, 255, 255, 0.1) inset;
+  text-align: center;
+  max-width: 600px;
+}
+
 .planet-info h1 {
-  font-size: 2.5em;
-  margin: 0;
-  font-weight: bold;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+  font-size: 3em;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: rgba(255, 255, 255, 0.98);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .planet-info p {
-  font-size: 1.2em;
-  margin: 10px 0 0 0;
-  color: #c8dcff;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+  font-size: 1.15em;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
-/* Shortcuts panel */
-#shortcuts {
+.shortcuts-panel {
   position: fixed;
-  right: 12px;
-  top: 60px;
-  width: 220px;
-  background: rgba(10, 12, 20, 0.7);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 10px 12px;
-  color: #dfe8ff;
-  z-index: 120;
-  border-radius: 8px;
-  font-size: 14px;
+  right: 20px;
+  top: 76px;
+  width: 260px;
+  background: rgba(20, 20, 25, 0.7);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.95);
+  z-index: 800;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+              0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
-#shortcuts h3 { margin: 0 0 6px 0; font-size: 15px }
-#shortcuts ul { margin: 0; padding-left: 18px }
-
-/* Planet list */
-#planet-list {
-  position: fixed;
-  left: 12px;
-  top: 60px;
-  width: 200px;
-  max-height: 70vh;
-  overflow: auto;
-  background: rgba(10, 12, 20, 0.7);
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 10px;
-  color: #dfe8ff;
-  z-index: 120;
-  border-radius: 8px;
+.shortcuts-panel.hidden {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  pointer-events: none;
 }
 
-.planet-items { display: flex; flex-direction: column; gap: 6px; margin-top: 8px }
-.planet-item {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #dfe8ff;
-  padding: 8px 10px;
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 590;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.02em;
+}
+
+.panel-content {
+  padding: 12px;
+}
+
+.close-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
   border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  text-align: left;
-}
-.planet-item:hover { background: rgba(255,255,255,0.08) }
-
-.planet-item.selected {
-  background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(120,160,255,0.06));
-  border-color: rgba(120,160,255,0.2);
-  box-shadow: 0 3px 10px rgba(80,120,220,0.06) inset;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* When planet-info is visible, allow clicks on it (so links/buttons could be placed) */
-.planet-info:not(.hidden) { pointer-events: auto }
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.close-btn svg {
+  display: block;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  background: transparent;
+  border-radius: 8px;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shortcut-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.shortcut-item:last-child {
+  margin-bottom: 0;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 26px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-weight: 500;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
+              0 0 0 0.5px rgba(255, 255, 255, 0.05) inset;
+  letter-spacing: 0.02em;
+}
+
+.shortcut-item span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  flex: 1;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .header {
+    top: 16px;
+    right: 16px;
+  }
+
+  .shortcuts-panel {
+    width: calc(100vw - 32px);
+    right: 16px;
+    max-width: 320px;
+  }
+
+  .planet-info h1 {
+    font-size: 2.2em;
+  }
+
+  .info-content {
+    padding: 24px 32px;
+    max-width: calc(100vw - 32px);
+  }
+}
+
+.control-btn:focus-visible,
+.close-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.shortcuts-panel:not(.hidden) {
+  animation: fadeInScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
