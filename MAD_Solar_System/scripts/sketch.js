@@ -16,6 +16,9 @@ const SUN_RADIUS = 80;
 // Planetas
 let planets = [];
 const NUM_PLANETS = 10;
+let selectedPlanet = null;
+let camX = 0, camY = -800, camZ = 1400; // posição da câmara
+let targetX = 0, targetY = -800, targetZ = 1400; // alvo para zoom suave
 
 function setup() {
   frameRate(60);
@@ -53,14 +56,35 @@ function setup() {
 
 function draw() {
   background(11, 13, 20);
-  // camera(0, -600, zoomFactor);
-  orbitControl(2, 2, 0.2);
 
-  // ajustar volume conforme zoom
-  if (spaceSound && soundEnabled) {
-    let vol = map(zoomFactor, 400, 2500, 1.0, 0.1, true);
-    spaceSound.setVolume(vol);
+  // câmara segue o planeta quando está em zoom
+  if (isZoomedIn && selectedPlanet) {
+    // posição do planeta em tempo real
+    let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+    let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+    
+    // câmara move-se com o planeta
+    targetX = px;
+    targetY = 0;
+    targetZ = pz + selectedPlanet.radius * 1 + 100;
   }
+
+  // smooth
+  camX = lerp(camX, targetX, 0.05);
+  camY = lerp(camY, targetY, 0.05);
+  camZ = lerp(camZ, targetZ, 0.05);
+  
+  // câmara sempre olha para o planeta
+  if (isZoomedIn && selectedPlanet) {
+    let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+    let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+    camera(camX, camY, camZ, px, 0, pz, 0, 1, 0);
+  } else {
+    camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
+  }
+
+  orbitControl(2, 2, 0.2);
+  
 
   // campo de estrelas
   push();
@@ -90,7 +114,19 @@ function draw() {
     p.update();
     p.display();
   }
+
+  // mostrar título quando planeta selecionado
+  if (selectedPlanet) {
+    resetMatrix(); // volta à 2D
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+    text(`🌌 Festival MAD ${2025 - selectedPlanet.type}`, width / 2, height / 2 - 40);
+    textSize(18);
+    text("Explora o universo da criatividade digital", width / 2, height / 2 + 10);
+  }
 }
+
 
 // class Planet
 class Planet {
@@ -111,13 +147,14 @@ class Planet {
     let x = cos(this.angle) * this.orbitRadius;
     let z = sin(this.angle) * this.orbitRadius;
 
-    // desenhar órbita
+    if (!isZoomedIn) {
     push();
     rotateX(HALF_PI);
     stroke(80, 90, 120, 80);
     noFill();
     circle(0, 0, this.orbitRadius * 2);
     pop();
+  }
 
     // desenhar planeta
     push();
@@ -212,8 +249,25 @@ class Planet {
     }
     pop();
   }
+
 }
 
+let isZoomedIn = false;
+
+function mousePressed() {
+  if (!isZoomedIn) {
+    // ZOOM IN - aproximar de um planeta
+    selectedPlanet = random(planets);
+    isZoomedIn = true;
+  } else {
+    // ZOOM OUT - voltar a ver tudo
+    selectedPlanet = null;
+    targetX = 0;
+    targetY = -800;
+    targetZ = 1400;
+    isZoomedIn = false;
+  }
+}
 
 function windowResized() {
   resizeCanvas(window.innerWidth, window.innerHeight);
