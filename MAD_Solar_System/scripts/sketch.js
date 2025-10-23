@@ -1,3 +1,6 @@
+// Textura dos planetas
+let planetTexture;
+
 // Som
 let spaceSound;
 let volume = 0.5;
@@ -18,17 +21,19 @@ const NUM_PLANETS = 10;
 let selectedPlanet = null;
 let hoveredPlanet = null;
 let isZoomedIn = false;
+
+// Câmara
 let camX = 0,
   camY = -800,
-  camZ = 2000;   // estava 1400 → agora começa mais longe
+  camZ = 2000;   
 let targetX = 0,
   targetY = -800,
   targetZ = 2000;
 
 
 function preload() {
-  // Carregar som ANTES de tudo
   spaceSound = loadSound("assets/sounds/space.mp3");
+  planetTexture = loadImage("assets/textures/tv.gif");
 }
 
 function setup() {
@@ -125,33 +130,46 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // campo de estrelas
-  push();
-  noStroke();
-  fill(255);
-  for (let s of stars) {
+  // campo de estrelas - ESCONDER no zoom
+  if (!isZoomedIn) {
     push();
-    translate(s.x, s.y, s.z);
-    sphere(1.5, 6, 4);
+    noStroke();
+    fill(255);
+    for (let s of stars) {
+      push();
+      translate(s.x, s.y, s.z);
+      sphere(1.5, 6, 4);
+      pop();
+    }
     pop();
   }
-  pop();
 
   // luzes
   ambientLight(60);
   directionalLight(255, 255, 255, 0.6, -1, -0.2);
 
-  // sol
-  push();
-  noStroke();
-  emissiveMaterial(255, 210, 80);
-  sphere(SUN_RADIUS, 48, 36);
-  pop();
+  // sol - ESCONDER no zoom
+  if (!isZoomedIn) {
+    push();
+    noStroke();
+    emissiveMaterial(255, 210, 80);
+    sphere(SUN_RADIUS, 48, 36);
+    pop();
+  }
 
-  // planetas
+  // planetas - mostrar APENAS o selecionado no zoom
   for (let p of planets) {
     p.update();
-    p.display();
+    
+    if (isZoomedIn) {
+      // No zoom: renderizar APENAS o planeta selecionado
+      if (p === selectedPlanet) {
+        p.display();
+      }
+    } else {
+      // Fora do zoom: mostrar todos
+      p.display();
+    }
   }
 }
 
@@ -300,29 +318,30 @@ class Planet {
         pop();
         break;
 
-      case 5: // eletric
-        // Núcleo energético
-        let electric = sin(frameCount * 0.15) * 100 + 155;
-        emissiveMaterial(electric, 240, 255);
-        sphere(this.radius, 32, 24);
-        // Raios dançantes
-        push();
-        stroke(255, 255, 100, 200);
-        strokeWeight(2);
-        for (let i = 0; i < 12; i++) {
-          let boltAngle = random(TWO_PI);
-          let boltDist = this.radius * 1.2;
-          let x1 = cos(boltAngle) * this.radius * 0.9;
-          let z1 = sin(boltAngle) * this.radius * 0.9;
-          let x2 = cos(boltAngle) * boltDist;
-          let z2 = sin(boltAngle) * boltDist;
-          if (frameCount % (10 + i) < 2) {
-            line(x1, 0, z1, x2, random(-10, 10), z2);
-          }
-        }
-        pop();
-        break;
+     case 5: // ⚡ PLANETA ELÉTRICO - Tempestade de raios com textura
+  push();
+  // aplicar textura ao planeta
+  texture(planetTexture);
+  sphere(this.radius, 48, 36);
+  pop();
 
+  // efeitos elétricos por cima
+  push();
+  stroke(255, 255, 100, 200);
+  strokeWeight(2);
+  for (let i = 0; i < 12; i++) {
+    let boltAngle = random(TWO_PI);
+    let boltDist = this.radius * 1.2;
+    let x1 = cos(boltAngle) * this.radius * 0.9;
+    let z1 = sin(boltAngle) * this.radius * 0.9;
+    let x2 = cos(boltAngle) * boltDist;
+    let z2 = sin(boltAngle) * boltDist;
+    if (frameCount % (10 + i) < 2) {
+      line(x1, 0, z1, x2, random(-10, 10), z2);
+    }
+  }
+  pop();
+  break;
       case 6: // nebulosa
         // Camadas de gás colorido
         for (let layer = 0; layer < 4; layer++) {
