@@ -18,9 +18,10 @@ let planets = [];
 const NUM_PLANETS = 10;
 
 function setup() {
+  frameRate(60);
   createCanvas(window.innerWidth, window.innerHeight, WEBGL);
-  camera(0, -600, 900); // x, y, z
-
+  camera(0, -800, 1400);
+  
   // gerar estrelas
   for (let i = 0; i < NUM_STARS; i++) {
     stars.push({
@@ -33,10 +34,10 @@ function setup() {
   // criar planetas
   for (let i = 0; i < NUM_PLANETS; i++) {
     let orbitRadius = 150 + i * 70; // distância do sol
-    let planetRadius = random(12, 25); // tamanho do planeta
-    let speed = random(0.005, 0.015); // velocidade de órbita
+    let planetRadius = random(20, 40); // tamanho do planeta
+    let speed = random(0.01, 0.0015); // velocidade de órbita
     let c = color(random(80, 255), random(80, 255), random(80, 255)); // cor diferente
-    planets.push(new Planet(orbitRadius, planetRadius, speed, c));
+    planets.push(new Planet(orbitRadius, planetRadius, speed, c, i));
   }
 
   // carregar o som
@@ -52,7 +53,7 @@ function setup() {
 
 function draw() {
   background(11, 13, 20);
-  camera(0, -600, zoomFactor);
+  // camera(0, -600, zoomFactor);
   orbitControl(2, 2, 0.2);
 
   // ajustar volume conforme zoom
@@ -93,12 +94,13 @@ function draw() {
 
 // class Planet
 class Planet {
-  constructor(orbitRadius, radius, speed, c) {
+  constructor(orbitRadius, radius, speed, c, type) {
     this.orbitRadius = orbitRadius;
     this.radius = radius;
     this.speed = speed;
     this.color = c;
-    this.angle = random(TWO_PI); // posição inicial
+    this.type = type;
+    this.angle = random(TWO_PI);
   }
 
   update() {
@@ -106,11 +108,10 @@ class Planet {
   }
 
   display() {
-    // posição 3D do planeta em órbita
     let x = cos(this.angle) * this.orbitRadius;
     let z = sin(this.angle) * this.orbitRadius;
 
-    // desenhar órbita (anel no chão)
+    // desenhar órbita
     push();
     rotateX(HALF_PI);
     stroke(80, 90, 120, 80);
@@ -122,12 +123,97 @@ class Planet {
     push();
     translate(x, 0, z);
     noStroke();
-    ambientMaterial(this.color);
-    sphere(this.radius, 32, 24);
 
+    switch (this.type) {
+      case 0: // noise planet
+        ambientMaterial(this.color);
+        let deform = noise(frameCount * 0.02, this.angle) * 2;
+        sphere(this.radius + deform, 24, 16);
+        break;
+
+      case 1: // 🪐 com anéis
+        ambientMaterial(this.color);
+        sphere(this.radius, 32, 24);
+        push();
+        rotateX(HALF_PI);
+        stroke(200);
+        noFill();
+        circle(0, 0, this.radius * 3);
+        circle(0, 0, this.radius * 4);
+        circle(0, 0, this.radius * 5);
+        circle(0, 0, this.radius * 6);
+        pop();
+        break;
+
+      case 2: // ✨ partículas orbitais
+        ambientMaterial(this.color);
+        sphere(this.radius, 24, 16);
+        push();
+        fill(255);
+        for (let i = 0; i < 6; i++) {
+          let a = frameCount * 0.05 + i * PI / 3;
+          let px = cos(a) * this.radius * 2;
+          let pz = sin(a) * this.radius * 2;
+          push();
+          translate(px, 0, pz);
+          sphere(2, 6, 4);
+          pop();
+        }
+        pop();
+        break;
+
+      case 3: // 🧊 vidro
+        specularMaterial(180);
+        shininess(80);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 4: // ⚙️ metálico
+        specularMaterial(120, 120, 140);
+        shininess(200);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 5: // 🌕 emissivo
+        emissiveMaterial(180, 240, 255);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 6: // 💡 neon digital
+        let glow = sin(frameCount * 0.1) * 100 + 155;
+        emissiveMaterial(glow, 0, 255);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 7: // 🌀 cor dinâmica via ruído
+        let n = noise(frameCount * 0.01, this.orbitRadius * 0.01) * 255;
+        ambientMaterial(n, 180, 255 - n);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 8: // 🌚 sombra forte
+        ambientMaterial(40, 40, 80);
+        shininess(10);
+        sphere(this.radius, 32, 24);
+        break;
+
+      case 9: // 🪨 fragmentado
+        ambientMaterial(this.color);
+        for (let i = 0; i < 5; i++) {
+          let dx = random(-this.radius / 2, this.radius / 2);
+          let dy = random(-this.radius / 2, this.radius / 2);
+          let dz = random(-this.radius / 2, this.radius / 2);
+          push();
+          translate(dx, dy, dz);
+          sphere(this.radius / 2.5, 16, 12);
+          pop();
+        }
+        break;
+    }
     pop();
   }
 }
+
 
 function windowResized() {
   resizeCanvas(window.innerWidth, window.innerHeight);
