@@ -434,10 +434,12 @@ class Planet {
             sin(frameCount * 0.02 + i) * 10,
             sin(angle) * dist
           );
-          rotateY(frameCount * 0.05);
-          specularMaterial(200, 240, 255);
-          shininess(250);
-          box(this.radius * 0.2);
+            rotateY(frameCount * 0.05);
+            // Use a blue emissive/specular material for the crystals
+            emissiveMaterial(80, 160, 255);
+            specularMaterial(140, 200, 255);
+            shininess(200);
+            box(this.radius * 0.2);
           pop();
         }
         break;
