@@ -33,6 +33,55 @@ let targetX = 0,
 
 let planetTextures = [];
 
+// Cursor shooting-star effect
+let cursorParticles = [];
+const MAX_CURSOR_PARTICLES = 80;
+
+class CursorParticle {
+  constructor(x, y, vx, vy) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.life = 40 + floor(random(0, 40));
+    this.size = random(4, 12);
+    this.hue = random(180, 255);
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    // slow down a bit
+    this.vx *= 0.94;
+    this.vy *= 0.94;
+    // gravity-ish fall for a slight arc
+    this.vy += 0.02;
+    this.life--;
+  }
+
+  drawScreen() {
+    // Draw in screen coordinates (canvas is WEBGL)
+    push();
+    resetMatrix();
+    translate(-width / 2, -height / 2);
+    blendMode(ADD);
+    noStroke();
+    const alpha = map(this.life, 0, 80, 0, 255);
+    fill(255, 255, 255, alpha);
+    ellipse(this.x, this.y, this.size);
+    // small tail
+    fill(255, 255, 255, alpha * 0.6);
+    const tx = this.x - this.vx * 3;
+    const ty = this.y - this.vy * 3;
+    ellipse(tx, ty, max(1, this.size * 0.6));
+    pop();
+  }
+
+  isDead() {
+    return this.life <= 0;
+  }
+}
+
 // Basic planet info for the UI (titles + descriptions)
 const planetInfos = [
   { title: 'Lava World', desc: 'A glowing planet of molten rock and fierce energy.' },
@@ -132,6 +181,9 @@ function setup() {
 
   textureMode(NORMAL);
   textureWrap(REPEAT, REPEAT);
+
+  // Hide system cursor; we'll draw a custom shooting-star trail
+  noCursor();
 
   // gerar estrelas
   for (let i = 0; i < NUM_STARS; i++) {
@@ -301,6 +353,14 @@ directionalLight(255, 255, 255, -0.3, 1, 0.1);
       // Fora do zoom: mostrar todos
       p.display();
     }
+  }
+
+  // Update and draw cursor particles (screen-space overlay)
+  for (let i = cursorParticles.length - 1; i >= 0; i--) {
+    const ps = cursorParticles[i];
+    ps.update();
+    ps.drawScreen();
+    if (ps.isDead()) cursorParticles.splice(i, 1);
   }
 }
 
@@ -605,4 +665,21 @@ function toggleSound() {
     spaceSound.setVolume(0);
     soundButton.textContent = "🔇";
   }
+}
+
+function mouseMoved() {
+  // spawn a few particles following mouse
+  for (let i = 0; i < 2; i++) {
+    if (cursorParticles.length >= MAX_CURSOR_PARTICLES) break;
+    const vx = random(-2, 2) + (pmouseX - mouseX) * 0.05;
+    const vy = random(-2, 2) + (pmouseY - mouseY) * 0.05;
+    const p = new CursorParticle(mouseX, mouseY, -vx * 1.4, -vy * 1.4);
+    cursorParticles.push(p);
+  }
+}
+
+function touchMoved() {
+  // behave like mouse moved for touch
+  mouseMoved();
+  return false;
 }
