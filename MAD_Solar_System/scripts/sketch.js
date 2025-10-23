@@ -20,10 +20,11 @@ let hoveredPlanet = null;
 let isZoomedIn = false;
 let camX = 0,
   camY = -800,
-  camZ = 1400;
+  camZ = 2000;   // estava 1400 → agora começa mais longe
 let targetX = 0,
   targetY = -800,
-  targetZ = 1400;
+  targetZ = 2000;
+
 
 function preload() {
   // Carregar som ANTES de tudo
@@ -33,7 +34,7 @@ function preload() {
 function setup() {
   frameRate(60);
   createCanvas(window.innerWidth, window.innerHeight, WEBGL);
-  camera(0, -800, 1400);
+  camera(0, -800, 2000);
 
   // gerar estrelas
   for (let i = 0; i < NUM_STARS; i++) {
@@ -70,10 +71,10 @@ function draw() {
   // 🔊 Ajustar volume baseado no zoom (CORRIGIDO)
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
-      spaceSound.setVolume(0.2); // volume mais baixo no zoom
+      spaceSound.setVolume(0.1); // volume mais baixo no zoom
     } else {
       let distFromCenter = dist(camX, camY, camZ, 0, 0, 0);
-      let vol = map(distFromCenter, 600, 2500, 0.5, 0.1, true);
+      let vol = map(distFromCenter, 400, 2800, 0.8, 0.05, true);
       spaceSound.setVolume(vol);
     }
   }
@@ -121,11 +122,6 @@ function draw() {
     camera(camX, camY, camZ, px, 0, pz, 0, 1, 0);
   } else {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
-  }
-
-  // 🎮 Controlo da câmara (CORRIGIDO - agora permite Y)
-  if (!isZoomedIn) {
-    orbitControl(2, 2, 0.2); // controlo livre com Y
   }
 
   // campo de estrelas
@@ -304,7 +300,7 @@ function mousePressed() {
     selectedPlanet = null;
     targetX = 0;
     targetY = -800;
-    targetZ = 1400;
+    targetZ = 2000;
     isZoomedIn = false;
     hidePlanetInfo();
   }
@@ -333,7 +329,7 @@ function windowResized() {
 function mouseWheel(event) {
   if (!isZoomedIn) {
     targetZ += event.delta * 2;
-    targetZ = constrain(targetZ, 600, 2500);
+    targetZ = constrain(targetZ, 600, 5000);
   }
   return false;
 }
