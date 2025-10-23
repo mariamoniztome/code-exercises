@@ -18,8 +18,12 @@ const NUM_PLANETS = 10;
 let selectedPlanet = null;
 let hoveredPlanet = null;
 let isZoomedIn = false;
-let camX = 0, camY = -800, camZ = 1400;
-let targetX = 0, targetY = -800, targetZ = 1400;
+let camX = 0,
+  camY = -800,
+  camZ = 1400;
+let targetX = 0,
+  targetY = -800,
+  targetZ = 1400;
 
 function preload() {
   // Carregar som ANTES de tudo
@@ -151,17 +155,6 @@ function draw() {
   for (let p of planets) {
     p.update();
     p.display();
-  }
-
-  // mostrar título quando planeta selecionado
-  if (selectedPlanet) {
-    resetMatrix();
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(32);
-    text(`🌌 Festival MAD ${2025 - selectedPlanet.type}`, width / 2, height / 2 - 50);
-    textSize(20);
-    text("Explora o universo da criatividade digital", width / 2, height / 2);
   }
 }
 
@@ -298,7 +291,6 @@ class Planet {
 }
 
 function mousePressed() {
-  // ▶️ Iniciar som se ainda não está a tocar (fix para browsers)
   if (spaceSound && !spaceSound.isPlaying()) {
     spaceSound.loop();
     spaceSound.setVolume(0.5);
@@ -307,13 +299,31 @@ function mousePressed() {
   if (!isZoomedIn && hoveredPlanet) {
     selectedPlanet = hoveredPlanet;
     isZoomedIn = true;
+    showPlanetInfo(selectedPlanet);
   } else if (isZoomedIn) {
     selectedPlanet = null;
     targetX = 0;
     targetY = -800;
     targetZ = 1400;
     isZoomedIn = false;
+    hidePlanetInfo();
   }
+}
+
+function showPlanetInfo(planet) {
+  const infoDiv = document.getElementById("planet-info");
+  const titleElement = document.getElementById("planet-title");
+  const descElement = document.getElementById("planet-description");
+
+  titleElement.textContent = `MAD Jam Fest ${2025 - planet.type}`;
+  descElement.textContent = "Explora o universo da criatividade digital";
+
+  infoDiv.classList.remove("hidden");
+}
+
+function hidePlanetInfo() {
+  const infoDiv = document.getElementById("planet-info");
+  infoDiv.classList.add("hidden");
 }
 
 function windowResized() {
