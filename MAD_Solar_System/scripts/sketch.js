@@ -9,8 +9,8 @@ let soundButton;
 
 // Estrelas
 let stars = [];
-const NUM_STARS = 200;
-const STAR_FIELD_SIZE = 2000;
+const NUM_STARS = 300;
+const STAR_FIELD_SIZE = 3000;
 
 // Sol
 const SUN_RADIUS = 80;
