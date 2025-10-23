@@ -1,0 +1,24 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #0b0d14;
+  color: #cfd5ff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  overflow: hidden;
+}
+
+/* Estilo geral de links e seleção */
+a {
+  color: #b7c3ff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+::selection {
+  background: #4951ff;
+  color: white;
+}
+
