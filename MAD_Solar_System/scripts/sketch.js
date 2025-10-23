@@ -2,7 +2,6 @@
 let spaceSound;
 let volume = 0.5;
 let soundEnabled = true;
-let zoomFactor = 900; // valor inicial da câmara
 let soundButton;
 
 // Estrelas
@@ -17,14 +16,21 @@ const SUN_RADIUS = 80;
 let planets = [];
 const NUM_PLANETS = 10;
 let selectedPlanet = null;
-let camX = 0, camY = -800, camZ = 1400; // posição da câmara
-let targetX = 0, targetY = -800, targetZ = 1400; // alvo para zoom suave
+let hoveredPlanet = null;
+let isZoomedIn = false;
+let camX = 0, camY = -800, camZ = 1400;
+let targetX = 0, targetY = -800, targetZ = 1400;
+
+function preload() {
+  // Carregar som ANTES de tudo
+  spaceSound = loadSound("assets/sounds/space.mp3");
+}
 
 function setup() {
   frameRate(60);
   createCanvas(window.innerWidth, window.innerHeight, WEBGL);
   camera(0, -800, 1400);
-  
+
   // gerar estrelas
   for (let i = 0; i < NUM_STARS; i++) {
     stars.push({
@@ -36,18 +42,18 @@ function setup() {
 
   // criar planetas
   for (let i = 0; i < NUM_PLANETS; i++) {
-    let orbitRadius = 150 + i * 70; // distância do sol
-    let planetRadius = random(20, 40); // tamanho do planeta
-    let speed = random(0.01, 0.0015); // velocidade de órbita
-    let c = color(random(80, 255), random(80, 255), random(80, 255)); // cor diferente
+    let orbitRadius = 200 + i * 100;
+    let planetRadius = random(35, 65);
+    let speed = random(0.008, 0.002);
+    let c = color(random(80, 255), random(80, 255), random(80, 255));
     planets.push(new Planet(orbitRadius, planetRadius, speed, c, i));
   }
 
-  // carregar o som
-  spaceSound = loadSound("assets/sounds/space.mp3", () => {
-    spaceSound.loop(); // toca em loop
-    spaceSound.setVolume(volume);
-  });
+  // iniciar som
+  if (spaceSound && !spaceSound.isPlaying()) {
+    spaceSound.loop();
+    spaceSound.setVolume(0.5);
+  }
 
   // botão de som
   soundButton = document.getElementById("sound-toggle");
@@ -57,24 +63,54 @@ function setup() {
 function draw() {
   background(11, 13, 20);
 
-  // câmara segue o planeta quando está em zoom
-  if (isZoomedIn && selectedPlanet) {
-    // posição do planeta em tempo real
-    let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
-    let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
-    
-    // câmara move-se com o planeta
-    targetX = px;
-    targetY = 0;
-    targetZ = pz + selectedPlanet.radius * 1 + 100;
+  // 🔊 Ajustar volume baseado no zoom (CORRIGIDO)
+  if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
+    if (isZoomedIn) {
+      spaceSound.setVolume(0.2); // volume mais baixo no zoom
+    } else {
+      let distFromCenter = dist(camX, camY, camZ, 0, 0, 0);
+      let vol = map(distFromCenter, 600, 2500, 0.5, 0.1, true);
+      spaceSound.setVolume(vol);
+    }
   }
 
-  // smooth
+  // Detetar planeta sob o rato
+  if (!isZoomedIn) {
+    hoveredPlanet = null;
+    let minDist = Infinity;
+
+    for (let p of planets) {
+      let px = cos(p.angle) * p.orbitRadius;
+      let pz = sin(p.angle) * p.orbitRadius;
+      let sx = width / 2 + px * 0.5;
+      let sy = height / 2 + pz * 0.5;
+      let d = dist(mouseX, mouseY, sx, sy);
+
+      if (d < 120 && d < minDist) {
+        minDist = d;
+        hoveredPlanet = p;
+      }
+    }
+  } else {
+    hoveredPlanet = null;
+  }
+
+  // câmara segue o planeta quando está em zoom
+  if (isZoomedIn && selectedPlanet) {
+    let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+    let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+
+    targetX = px;
+    targetY = 0;
+    targetZ = pz + selectedPlanet.radius * 1.5 + 80;
+  }
+
+  // movimento suave da câmara
   camX = lerp(camX, targetX, 0.05);
   camY = lerp(camY, targetY, 0.05);
   camZ = lerp(camZ, targetZ, 0.05);
-  
-  // câmara sempre olha para o planeta
+
+  // câmara sempre olha para o alvo
   if (isZoomedIn && selectedPlanet) {
     let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
@@ -83,8 +119,10 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  orbitControl(2, 2, 0.2);
-  
+  // 🎮 Controlo da câmara (CORRIGIDO - agora permite Y)
+  if (!isZoomedIn) {
+    orbitControl(2, 2, 0.2); // controlo livre com Y
+  }
 
   // campo de estrelas
   push();
@@ -117,16 +155,15 @@ function draw() {
 
   // mostrar título quando planeta selecionado
   if (selectedPlanet) {
-    resetMatrix(); // volta à 2D
+    resetMatrix();
     fill(255);
     textAlign(CENTER, CENTER);
-    textSize(28);
-    text(`🌌 Festival MAD ${2025 - selectedPlanet.type}`, width / 2, height / 2 - 40);
-    textSize(18);
-    text("Explora o universo da criatividade digital", width / 2, height / 2 + 10);
+    textSize(32);
+    text(`🌌 Festival MAD ${2025 - selectedPlanet.type}`, width / 2, height / 2 - 50);
+    textSize(20);
+    text("Explora o universo da criatividade digital", width / 2, height / 2);
   }
 }
-
 
 // class Planet
 class Planet {
@@ -148,27 +185,36 @@ class Planet {
     let z = sin(this.angle) * this.orbitRadius;
 
     if (!isZoomedIn) {
-    push();
-    rotateX(HALF_PI);
-    stroke(80, 90, 120, 80);
-    noFill();
-    circle(0, 0, this.orbitRadius * 2);
-    pop();
-  }
+      push();
+      rotateX(HALF_PI);
+      stroke(80, 90, 120, 80);
+      noFill();
+      circle(0, 0, this.orbitRadius * 2);
+      pop();
+    }
 
-    // desenhar planeta
+    if (this === hoveredPlanet) {
+      push();
+      translate(x, 0, z);
+      noFill();
+      stroke(255, 255, 0);
+      strokeWeight(2);
+      sphere(this.radius * 1.5, 16, 12);
+      pop();
+    }
+
     push();
     translate(x, 0, z);
     noStroke();
 
     switch (this.type) {
-      case 0: // noise planet
+      case 0:
         ambientMaterial(this.color);
         let deform = noise(frameCount * 0.02, this.angle) * 2;
         sphere(this.radius + deform, 24, 16);
         break;
 
-      case 1: // 🪐 com anéis
+      case 1:
         ambientMaterial(this.color);
         sphere(this.radius, 32, 24);
         push();
@@ -182,13 +228,13 @@ class Planet {
         pop();
         break;
 
-      case 2: // ✨ partículas orbitais
+      case 2:
         ambientMaterial(this.color);
         sphere(this.radius, 24, 16);
         push();
         fill(255);
         for (let i = 0; i < 6; i++) {
-          let a = frameCount * 0.05 + i * PI / 3;
+          let a = frameCount * 0.05 + (i * PI) / 3;
           let px = cos(a) * this.radius * 2;
           let pz = sin(a) * this.radius * 2;
           push();
@@ -199,42 +245,42 @@ class Planet {
         pop();
         break;
 
-      case 3: // 🧊 vidro
+      case 3:
         specularMaterial(180);
         shininess(80);
         sphere(this.radius, 32, 24);
         break;
 
-      case 4: // ⚙️ metálico
+      case 4:
         specularMaterial(120, 120, 140);
         shininess(200);
         sphere(this.radius, 32, 24);
         break;
 
-      case 5: // 🌕 emissivo
+      case 5:
         emissiveMaterial(180, 240, 255);
         sphere(this.radius, 32, 24);
         break;
 
-      case 6: // 💡 neon digital
+      case 6:
         let glow = sin(frameCount * 0.1) * 100 + 155;
         emissiveMaterial(glow, 0, 255);
         sphere(this.radius, 32, 24);
         break;
 
-      case 7: // 🌀 cor dinâmica via ruído
+      case 7:
         let n = noise(frameCount * 0.01, this.orbitRadius * 0.01) * 255;
         ambientMaterial(n, 180, 255 - n);
         sphere(this.radius, 32, 24);
         break;
 
-      case 8: // 🌚 sombra forte
+      case 8:
         ambientMaterial(40, 40, 80);
         shininess(10);
         sphere(this.radius, 32, 24);
         break;
 
-      case 9: // 🪨 fragmentado
+      case 9:
         ambientMaterial(this.color);
         for (let i = 0; i < 5; i++) {
           let dx = random(-this.radius / 2, this.radius / 2);
@@ -249,18 +295,19 @@ class Planet {
     }
     pop();
   }
-
 }
 
-let isZoomedIn = false;
-
 function mousePressed() {
-  if (!isZoomedIn) {
-    // ZOOM IN - aproximar de um planeta
-    selectedPlanet = random(planets);
+  // ▶️ Iniciar som se ainda não está a tocar (fix para browsers)
+  if (spaceSound && !spaceSound.isPlaying()) {
+    spaceSound.loop();
+    spaceSound.setVolume(0.5);
+  }
+
+  if (!isZoomedIn && hoveredPlanet) {
+    selectedPlanet = hoveredPlanet;
     isZoomedIn = true;
-  } else {
-    // ZOOM OUT - voltar a ver tudo
+  } else if (isZoomedIn) {
     selectedPlanet = null;
     targetX = 0;
     targetY = -800;
@@ -274,14 +321,20 @@ function windowResized() {
 }
 
 function mouseWheel(event) {
-  zoomFactor += event.delta * 0.5; // roda para zoom in/out
-  zoomFactor = constrain(zoomFactor, 400, 2500); // limitar zoom
+  if (!isZoomedIn) {
+    targetZ += event.delta * 2;
+    targetZ = constrain(targetZ, 600, 2500);
+  }
+  return false;
 }
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
 
   if (soundEnabled) {
+    if (spaceSound && !spaceSound.isPlaying()) {
+      spaceSound.loop();
+    }
     spaceSound.setVolume(0.5);
     soundButton.textContent = "🔊";
   } else {
