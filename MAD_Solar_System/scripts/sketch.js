@@ -1,3 +1,9 @@
+// Som
+let spaceSound;
+let volume = 0.5;
+let soundEnabled = true;
+let zoomFactor = 900; // valor inicial da câmara
+
 // Estrelas
 let stars = [];
 const NUM_STARS = 200;
@@ -31,11 +37,24 @@ function setup() {
     let c = color(random(80, 255), random(80, 255), random(80, 255)); // cor diferente
     planets.push(new Planet(orbitRadius, planetRadius, speed, c));
   }
+
+  // carregar o som
+  spaceSound = loadSound("assets/sounds/space.mp3", () => {
+    spaceSound.loop(); // toca em loop
+    spaceSound.setVolume(volume);
+  });
 }
 
 function draw() {
   background(11, 13, 20);
+  camera(0, -600, zoomFactor);
   orbitControl(2, 2, 0.2);
+
+  // ajustar volume conforme zoom
+  if (spaceSound && soundEnabled) {
+    let vol = map(zoomFactor, 400, 2500, 1.0, 0.1, true);
+    spaceSound.setVolume(vol);
+  }
 
   // campo de estrelas
   push();
@@ -107,4 +126,9 @@ class Planet {
 
 function windowResized() {
   resizeCanvas(window.innerWidth, window.innerHeight);
+}
+
+function mouseWheel(event) {
+  zoomFactor += event.delta * 0.5; // roda para zoom in/out
+  zoomFactor = constrain(zoomFactor, 400, 2500); // limitar zoom
 }
