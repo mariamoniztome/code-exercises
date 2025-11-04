@@ -4,7 +4,7 @@ const db = require('./db');
 const app = express();
 const PORT = 3000;
 
-app.get('/users', (req, res) => {
+app.get('/', (req, res) => {
   db.query('SELECT * FROM users', (err, results) => {
     if (err) {
       console.error('Erro na query:', err);
