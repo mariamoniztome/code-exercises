@@ -16,19 +16,19 @@
   <body>
     <script src="scripts/sketch.js"></script>
     
-    <!-- Header Controls -->
+     <!-- Header Controls -->
     <header class="header">
       <div class="header-controls">
-        <button id="sound-toggle" class="control-btn" title="Toggle Sound">
+        <button id="sound-toggle" class="control-btn" title="Toggle Sound" aria-label="Alternar Som">
           <span class="icon">🔊</span>
         </button>
-        <button id="help-toggle" class="control-btn" title="Show Shortcuts">
+        <button id="help-toggle" class="control-btn" title="Show Shortcuts" aria-label="Mostrar Atalhos">
           <span class="icon">?</span>
         </button>
       </div>
     </header>
 
-    <!-- Planet Info Overlay -->
+    <!-- Planet Info Overlay (Reduzido e no canto) -->
     <div id="planet-info" class="planet-info hidden">
       <div class="info-content">
         <h1 id="planet-title">Festival MAD 2025</h1>
@@ -36,32 +36,40 @@
       </div>
     </div>
 
-    <!-- Shortcuts Panel (toggle) -->
+    <!-- Shortcuts Panel -->
     <div id="shortcuts" class="panel shortcuts-panel hidden">
       <div class="panel-header">
-        <h3>Atalhos</h3>
-        <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')">×</button>
+        <h3>Atalhos de Teclado</h3>
+        <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')" aria-label="Fechar">×</button>
       </div>
       <div class="panel-content">
         <div class="shortcut-item">
           <kbd>1-0</kbd>
-          <span>Selecionar planeta 1–10</span>
+          <span>Selecionar cubos 2017–2026</span>
         </div>
         <div class="shortcut-item">
           <kbd>Esc</kbd>
-          <span>Sair do zoom / desselecionar</span>
+          <span>Sair do zoom</span>
         </div>
         <div class="shortcut-item">
           <kbd>Space</kbd>
-          <span>Pausar animação</span>
+          <span>Pausar/Reproduzir animação</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>H</kbd>
+          <span>Para mostrar/ocultar atalhos</span>
         </div>
         <div class="shortcut-item">
           <kbd>Mouse</kbd>
-          <span>Hover para destacar, Click para zoom</span>
+          <span>Hover + Click para interagir</span>
         </div>
         <div class="shortcut-item">
           <kbd>Wheel</kbd>
           <span>Zoom da câmera</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Voice</kbd>
+          <span>Diz "one"-"nine" para navegar</span>
         </div>
       </div>
     </div>
@@ -69,7 +77,18 @@
     <script>
       // Toggle shortcuts panel
       document.getElementById('help-toggle').addEventListener('click', function() {
-        document.getElementById('shortcuts').classList.toggle('hidden');
+        const panel = document.getElementById('shortcuts');
+        panel.classList.toggle('hidden');
+      });
+
+      // Hide shortcuts when clicking outside
+      document.addEventListener('click', function(e) {
+        const shortcuts = document.getElementById('shortcuts');
+        const helpBtn = document.getElementById('help-toggle');
+        
+        if (!shortcuts.contains(e.target) && e.target !== helpBtn && !helpBtn.contains(e.target)) {
+          shortcuts.classList.add('hidden');
+        }
       });
     </script>
   </body>
