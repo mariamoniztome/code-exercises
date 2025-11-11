@@ -20,8 +20,13 @@
     <header class="header">
       <div class="header-controls">
         <button id="sound-toggle" class="control-btn" title="Toggle Sound" aria-label="Alternar Som">
-          <span class="icon">🔊</span>
+          <i data-lucide="volume-2" class="icon" style="width: 1.2em; height: 1.2em; color: white;"></i>
         </button>
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script>
+          lucide.createIcons();
+        </script>
         <button id="help-toggle" class="control-btn" title="Show Shortcuts" aria-label="Mostrar Atalhos">
           <span class="icon">?</span>
         </button>
