@@ -47,6 +47,11 @@ let poses = [];
 let globalBrightness = 1.0;
 let globalColorTint = null;
 
+// Image cycling
+let currentImageIndex = 0;
+let lastImageChange = 0;
+const IMAGE_CHANGE_INTERVAL = 1000; // Change image every second
+
 class CursorParticle {
   constructor(x, y, vx, vy) {
     this.x = x;
@@ -70,25 +75,26 @@ class CursorParticle {
   drawScreen() {
     push();
     resetMatrix();
-    translate(-width / 2, -height / 2);
+    // Convert stored mouse (top-left) coords into WEBGL drawing space.
+    translate(this.x - width / 2, this.y - height / 2);
     blendMode(ADD);
     noStroke();
     const alpha = map(this.life, 0, 80, 0, 255);
-    
-    // Estrela principal
+
+    // Main star (draw at origin after translating)
     fill(255, 255, 255, alpha);
-    ellipse(this.x, this.y, this.size);
-    
-    // Brilho suave
+    ellipse(0, 0, this.size);
+
+    // Soft glow
     fill(255, 255, 255, alpha * 0.4);
-    ellipse(this.x, this.y, this.size * 1.8);
-    
-    // Cauda da estrela
+    ellipse(0, 0, this.size * 1.8);
+
+    // Star tail
     fill(255, 255, 255, alpha * 0.6);
-    const tx = this.x - this.vx * 4;
-    const ty = this.y - this.vy * 4;
+    const tx = -this.vx * 4;
+    const ty = -this.vy * 4;
     ellipse(tx, ty, max(1, this.size * 0.5));
-    
+
     pop();
   }
   
@@ -175,6 +181,13 @@ class Planet {
     translate(x,0,z);
     scale(this.hoverScale);
     
+    // Update image index every second
+    const now = millis();
+    if (now - lastImageChange > IMAGE_CHANGE_INTERVAL) {
+      currentImageIndex = (currentImageIndex + 1) % 8; // Cycle through 8 images (0-7)
+      lastImageChange = now;
+    }
+    
     if(this.glowIntensity>0.1){
       push();
       noFill();
@@ -199,7 +212,9 @@ class Planet {
     if(globalColorTint)tint(globalColorTint);
     
     push();
-    texture(planetTextures[this.index]);
+    // Use currentImageIndex to cycle through the first 8 images
+    const textureIndex = this.index % 8; // Ensure we only use first 8 textures
+    texture(planetTextures[textureIndex]);
     if(this.glowIntensity>0.1)
       emissiveMaterial(
         this.yearData.color.r*this.glowIntensity*0.4,
