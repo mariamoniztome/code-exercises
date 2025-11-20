@@ -1,3 +1,7 @@
+let lastImageChange = 0;
+const IMAGE_CHANGE_INTERVAL = 1000; // Change image every second
+let currentImageIndex = 0;
+
 class Planet {
   constructor(orbitRadius, size, speed, yearData, index) {
     this.orbitRadius = orbitRadius;

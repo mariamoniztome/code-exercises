@@ -40,11 +40,6 @@ const MAX_CURSOR_PARTICLES = 60;
 let globalBrightness = 1.0;
 let globalColorTint = null;
 
-// Image cycling
-let currentImageIndex = 0;
-let lastImageChange = 0;
-const IMAGE_CHANGE_INTERVAL = 1000; // Change image every second
-
 // ---------------------- FUNÇÕES GLOBAIS ----------------------
 function autoAdjustStars() {
   const fps = frameRate();
@@ -360,42 +355,6 @@ function draw() {
   }
 }
 
-function drawHoverTooltip() {
-  push();
-  resetMatrix();
-
-  let tx = mouseX - width / 2;
-  let ty = mouseY - height / 2 - 60;
-  translate(tx, ty);
-
-  // Background colorido
-  fill(
-    hoveredPlanet.yearData.color.r,
-    hoveredPlanet.yearData.color.g,
-    hoveredPlanet.yearData.color.b,
-    230
-  );
-  stroke(255);
-  strokeWeight(3);
-  rectMode(CENTER);
-  rect(0, 0, 180, 70, 12);
-
-  // Ano
-  noStroke();
-  fill(255);
-  textSize(28);
-  textAlign(CENTER, CENTER);
-  textFont("Arial");
-  text(hoveredPlanet.yearData.year, 0, -12);
-
-  // Tema
-  textSize(14);
-  fill(255, 255, 255, 220);
-  text(hoveredPlanet.yearData.theme, 0, 15);
-
-  pop();
-}
-
 function mousePressed() {
   if (spaceSound && !spaceSound.isPlaying()) {
     spaceSound.loop();
@@ -416,23 +375,6 @@ function mousePressed() {
   }
 }
 
-function showPlanetInfo(planet) {
-  const info = document.getElementById("planet-info");
-  const title = document.getElementById("planet-title");
-  const desc = document.getElementById("planet-description");
-
-  if (info && title && desc) {
-    title.textContent = `${planet.yearData.year} — ${planet.yearData.theme}`;
-    desc.textContent = planet.yearData.details;
-    info.classList.remove("hidden");
-  }
-}
-
-function hidePlanetInfo() {
-  const info = document.getElementById("planet-info");
-  if (info) info.classList.add("hidden");
-}
-
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
@@ -443,38 +385,6 @@ function mouseWheel(event) {
     targetZ = constrain(targetZ, 600, 5000);
   }
   return false;
-}
-
-function toggleSound() {
-  soundEnabled = !soundEnabled;
-  const icon = document.querySelector("#sound-toggle .icon");
-
-  if (soundEnabled) {
-    if (spaceSound && !spaceSound.isPlaying()) spaceSound.loop();
-    spaceSound.setVolume(0.5);
-    if (soundButton) {
-      const newIcon = document.createElement("i");
-      newIcon.setAttribute("data-lucide", "volume-2");
-      newIcon.className = "icon";
-      newIcon.style.width = "1.2em";
-      newIcon.style.height = "1.2em";
-      newIcon.style.color = "white";
-      icon.replaceWith(newIcon);
-      lucide.createIcons();
-    }
-  } else {
-    spaceSound.setVolume(0);
-    if (soundButton) {
-      const newIcon = document.createElement("i");
-      newIcon.setAttribute("data-lucide", "volume-x");
-      newIcon.className = "icon";
-      newIcon.style.width = "1.2em";
-      newIcon.style.height = "1.2em";
-      newIcon.style.color = "white";
-      icon.replaceWith(newIcon);
-      lucide.createIcons();
-    }
-  }
 }
 
 function mouseMoved() {
