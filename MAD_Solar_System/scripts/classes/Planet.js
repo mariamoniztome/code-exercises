@@ -89,7 +89,7 @@ class Planet {
       this.yearData.color.r,
       this.yearData.color.g,
       this.yearData.color.b,
-      80
+      40
     );
     strokeWeight(3);
     rotateX(PI / 2);

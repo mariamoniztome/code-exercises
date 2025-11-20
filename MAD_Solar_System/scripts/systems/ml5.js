@@ -64,6 +64,10 @@ function gotCommand(error, results) {
 // ---------------------------------------------------------------------
 // 3) POSENET — atualizado para mão esquerda/direita
 // ---------------------------------------------------------------------
+function gotPoses(results) {
+  if (results.length === 0) return;
+  poses = results;   // atualiza a variável global usada no draw()
+}
 
 function setupPoseNet() {
   console.log("PoseNet...");
@@ -107,21 +111,14 @@ function getHandY() {
   return null;
 }
 
-// 🆕 NOVO: Atualiza o sunProgress automaticamente baseado na mão
 function updateSunCycle() {
+  const x = getHandX();
   const y = getHandY();
-  if (y === null) return;
+  if (x === null || y === null) return;
 
-  // y=0 (topo)->1 (dia), y=480 (baixo)->0 (noite)
-  let target = map(y, 0, 480, 1, 0);
-  target = constrain(target, 0, 1);
+  // HUE controla a cor (mover horizontal)
+  sunHue = map(x, 0, 640, 0, 360);
 
-  sunProgress = lerp(sunProgress, target, 0.1); // movimento suave
-}
-
-// A tua função original de PoseNet agora só atualiza "poses"
-function gotPoses(results) {
-  if (results.length === 0) return;
-
-  poses = results;
+  // brilho controla intensidade (mover vertical)
+  sunBright = map(y, 480, 0, 0.3, 2.5); // de escuro → muito brilhante
 }

@@ -20,6 +20,9 @@ const STAR_FIELD_SIZE = 3000;
 const SUN_RADIUS = 80;
 // solarColor é global para também ser usado visualmente nos planetas
 let solarColor = { r: 255, g: 210, b: 80 };
+let sunHue = 30;     // 0–360
+let sunBright = 1.0; // 0–1
+
 
 // Planetas
 let planets = [];
@@ -203,6 +206,36 @@ function setup() {
 }
 
 // ---------------------- DRAW HELPERS ----------------------
+function hslToRgb(h, s, l) {
+  h /= 360;
+  let r, g, b;
+
+  if (s === 0) {
+    r = g = b = l; 
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+
+  return {
+    r: round(r * 255),
+    g: round(g * 255),
+    b: round(b * 255)
+  };
+}
 
 function drawStars() {
   push();
@@ -223,39 +256,26 @@ function drawStars() {
 }
 
 // ---------------------- MAIN DRAW ----------------------
-
 function draw() {
-  // 1) Atualiza ciclo solar pela mão (PoseNet em ml5.js)
+
+  // 1) Atualiza ciclo solar pela mão (via PoseNet em ml5.js)
   updateSunCycle();
 
   // 2) Fundo do espaço
   background(5, 5, 15);
 
-  // 3) Cor do sol (noite → sunset → dia)
-  const nightColor = { r: 40, g: 60, b: 120 };   // azul frio
-  const sunsetColor = { r: 255, g: 140, b: 60 }; // laranja quente
-  const dayColor = { r: 255, g: 210, b: 80 };    // amarelo sol
+  // ============================================================
+  // 🌈 3) SOL MULTICOLOR — HSL → RGB
+  // sunHue vai de 0 a 360 controlado pela mão
+  // ============================================================
+  let rgb = hslToRgb(sunHue, 1.0, 0.5);  // saturação 100%, luz 50%
+  solarColor = rgb;                      // atualiza cor global do sol
 
-  if (sunProgress < 0.5) {
-    // noite → pôr do sol
-    const t = sunProgress * 2;
-    solarColor = {
-      r: lerp(nightColor.r, sunsetColor.r, t),
-      g: lerp(nightColor.g, sunsetColor.g, t),
-      b: lerp(nightColor.b, sunsetColor.b, t),
-    };
-  } else {
-    // pôr do sol → dia
-    const t = (sunProgress - 0.5) * 2;
-    solarColor = {
-      r: lerp(sunsetColor.r, dayColor.r, t),
-      g: lerp(sunsetColor.g, dayColor.g, t),
-      b: lerp(sunsetColor.b, dayColor.b, t),
-    };
-  }
+  // ============================================================
+  // 🔥 4) LUZ SOLAR REAL 3D EM P5 — baseada na cor HSL
+  // ============================================================
+  let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo
 
-  // 4) Luz solar dinâmica (apenas p5 3D real)
-  let intensity = lerp(0.3, 2.5, sunProgress); // bem forte de dia
   let lr = solarColor.r * intensity;
   let lg = solarColor.g * intensity;
   let lb = solarColor.b * intensity;
@@ -263,7 +283,7 @@ function draw() {
   // Luz ambiente muito suave
   ambientLight(10);
 
-  // Luz direcional (como um sol ao fundo)
+  // Luz direcional (sol como um feixe a partir do topo-direita)
   directionalLight(
     lr,
     lg,
@@ -271,7 +291,7 @@ function draw() {
     0.5, -0.3, -0.4
   );
 
-  // Luz pontual forte na posição do Sol (centro)
+  // Luz pontual intensa (o brilho do sol propriamente dito)
   pointLight(
     lr * 2,
     lg * 2,
@@ -279,7 +299,9 @@ function draw() {
     0, 0, 0
   );
 
-  // 5) Som dinâmico
+  // ============================================================
+  // 🔊 5) Som dinâmico
+  // ============================================================
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
       spaceSound.setVolume(0.1);
@@ -290,7 +312,9 @@ function draw() {
     }
   }
 
-  // 6) Hover detection
+  // ============================================================
+  // 🪐 6) Hover detection
+  // ============================================================
   if (!isZoomedIn) {
     hoveredPlanet = null;
     for (let p of planets) {
@@ -312,7 +336,9 @@ function draw() {
     }
   } else hoveredPlanet = null;
 
-  // 7) Camera tracking
+  // ============================================================
+  // 🎥 7) Camera tracking
+  // ============================================================
   if (isZoomedIn && selectedPlanet) {
     let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
@@ -333,11 +359,15 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // 8) Estrelas
+  // ============================================================
+  // ✨ 8) Estrelas
+  // ============================================================
   autoAdjustStars();
   drawStars();
 
-  // 9) Sol 3D (sem glow 2D)
+  // ============================================================
+  // ☀️ 9) Sol 3D multicolor (sem glow 2D)
+  // ============================================================
   if (!isZoomedIn) {
     push();
     noStroke();
@@ -345,7 +375,7 @@ function draw() {
     // Cor base do sol
     ambientMaterial(solarColor.r, solarColor.g, solarColor.b);
 
-    // Emissão forte — faz o sol "queimar" a retina 😄
+    // Emissão MUITO forte (efeito "queimar a retina")
     emissiveMaterial(
       solarColor.r * 4,
       solarColor.g * 4,
@@ -356,14 +386,18 @@ function draw() {
     pop();
   }
 
-  // 10) Órbitas
+  // ============================================================
+  // 🌓 10) Órbitas
+  // ============================================================
   if (!isZoomedIn) {
     for (let p of planets) {
       p.drawOrbit();
     }
   }
 
-  // 11) Planetas
+  // ============================================================
+  // 🌍 11) Planetas
+  // ============================================================
   for (let p of planets) {
     if (!isPaused) p.update();
     if (!isZoomedIn || p === selectedPlanet) {
@@ -371,11 +405,14 @@ function draw() {
     }
   }
 
-  // 12) Tooltip hover
+  // ============================================================
+  // ℹ️ 12) Tooltip hover
+  // ============================================================
   if (hoveredPlanet && !isZoomedIn) {
     drawHoverTooltip();
   }
 }
+
 
 // ---------------------- INPUT ----------------------
 
