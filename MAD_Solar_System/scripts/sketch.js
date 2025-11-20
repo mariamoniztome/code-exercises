@@ -20,9 +20,8 @@ const STAR_FIELD_SIZE = 3000;
 const SUN_RADIUS = 80;
 // solarColor é global para também ser usado visualmente nos planetas
 let solarColor = { r: 255, g: 210, b: 80 };
-let sunHue = 30;     // 0–360
+let sunHue = 30; // 0–360
 let sunBright = 1.0; // 0–1
-
 
 // Planetas
 let planets = [];
@@ -211,29 +210,29 @@ function hslToRgb(h, s, l) {
   let r, g, b;
 
   if (s === 0) {
-    r = g = b = l; 
+    r = g = b = l;
   } else {
     const hue2rgb = (p, q, t) => {
       if (t < 0) t += 1;
       if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
       return p;
     };
 
     const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
     const p = 2 * l - q;
 
-    r = hue2rgb(p, q, h + 1/3);
+    r = hue2rgb(p, q, h + 1 / 3);
     g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
+    b = hue2rgb(p, q, h - 1 / 3);
   }
 
   return {
     r: round(r * 255),
     g: round(g * 255),
-    b: round(b * 255)
+    b: round(b * 255),
   };
 }
 
@@ -257,7 +256,6 @@ function drawStars() {
 
 // ---------------------- MAIN DRAW ----------------------
 function draw() {
-
   // 1) Atualiza ciclo solar pela mão (via PoseNet em ml5.js)
   updateSunCycle();
 
@@ -268,8 +266,8 @@ function draw() {
   // 🌈 3) SOL MULTICOLOR — HSL → RGB
   // sunHue vai de 0 a 360 controlado pela mão
   // ============================================================
-  let rgb = hslToRgb(sunHue, 1.0, 0.5);  // saturação 100%, luz 50%
-  solarColor = rgb;                      // atualiza cor global do sol
+  let rgb = hslToRgb(sunHue, 1.0, 0.5); // saturação 100%, luz 50%
+  solarColor = rgb; // atualiza cor global do sol
 
   // ============================================================
   // 🔥 4) LUZ SOLAR REAL 3D EM P5 — baseada na cor HSL
@@ -284,20 +282,10 @@ function draw() {
   ambientLight(10);
 
   // Luz direcional (sol como um feixe a partir do topo-direita)
-  directionalLight(
-    lr,
-    lg,
-    lb,
-    0.5, -0.3, -0.4
-  );
+  directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
 
   // Luz pontual intensa (o brilho do sol propriamente dito)
-  pointLight(
-    lr * 2,
-    lg * 2,
-    lb * 2,
-    0, 0, 0
-  );
+  pointLight(lr * 2, lg * 2, lb * 2, 0, 0, 0);
 
   // ============================================================
   // 🔊 5) Som dinâmico
@@ -368,21 +356,38 @@ function draw() {
   // ============================================================
   // ☀️ 9) Sol 3D multicolor (sem glow 2D)
   // ============================================================
+  // 9) Sol 3D multicolor (sem glow 2D)
   if (!isZoomedIn) {
     push();
     noStroke();
 
-    // Cor base do sol
-    ambientMaterial(solarColor.r, solarColor.g, solarColor.b);
+    let base = solarColor;
 
-    // Emissão MUITO forte (efeito "queimar a retina")
-    emissiveMaterial(
-      solarColor.r * 4,
-      solarColor.g * 4,
-      solarColor.b * 4
-    );
-
+    // CAMADA 1 — núcleo super brilhante
+    emissiveMaterial(base.r * 4, base.g * 4, base.b * 4);
     sphere(SUN_RADIUS, 64, 48);
+
+    // CAMADA 2 — halo interno
+    push();
+    emissiveMaterial(base.r * 0.8, base.g * 0.8, base.b * 0.8);
+    scale(1.3);
+    sphere(SUN_RADIUS, 64, 48);
+    pop();
+
+    // CAMADA 3 — halo externo soft (aura celestial)
+    push();
+    emissiveMaterial(base.r * 0.4, base.g * 0.4, base.b * 0.4);
+    scale(1.6);
+    sphere(SUN_RADIUS, 64, 48);
+    pop();
+
+    // CAMADA 4 — bloom falso muito suave
+    push();
+    emissiveMaterial(base.r * 0.25, base.g * 0.25, base.b * 0.25);
+    scale(2.0);
+    sphere(SUN_RADIUS, 64, 48);
+    pop();
+
     pop();
   }
 
@@ -412,7 +417,6 @@ function draw() {
     drawHoverTooltip();
   }
 }
-
 
 // ---------------------- INPUT ----------------------
 
