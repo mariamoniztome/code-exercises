@@ -1,100 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MAD Solar System</title>
-    <!-- p5.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-    <!-- p5.js Sound Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
-    <!-- ml5.js -->
-<script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles/style.css" />
-  </head>
-  <body>
-    <script src="scripts/sketch.js"></script>
-    
-     <!-- Header Controls -->
-    <header class="header">
-      <div class="header-controls">
-        <button id="sound-toggle" class="control-btn" title="Toggle Sound" aria-label="Alternar Som">
-          <i data-lucide="volume-2" class="icon" style="width: 1.2em; height: 1.2em; color: white;"></i>
-        </button>
-        <!-- Lucide Icons -->
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <script>
-          lucide.createIcons();
-        </script>
-        <button id="help-toggle" class="control-btn" title="Show Shortcuts" aria-label="Mostrar Atalhos">
-          <span class="icon">?</span>
-        </button>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAD Solar System</title>
 
-    <!-- Planet Info Overlay (Reduzido e no canto) -->
-    <div id="planet-info" class="planet-info hidden">
-      <div class="info-content">
-        <h1 id="planet-title">Festival MAD 2025</h1>
-        <p id="planet-description">Explora o universo da criatividade digital</p>
-      </div>
+  <!-- p5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+
+  <!-- ml5.js -->
+  <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+
+  <!-- Ícones -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-controls">
+      <button id="sound-toggle" class="control-btn" title="Som">
+        <i data-lucide="volume-2" class="icon"></i>
+      </button>
+
+      <button id="help-toggle" class="control-btn" title="Atalhos">
+        <span class="icon">?</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Painel Info -->
+  <div id="planet-info" class="planet-info hidden">
+    <div class="info-content">
+      <h1 id="planet-title"></h1>
+      <p id="planet-description"></p>
+    </div>
+  </div>
+
+  <!-- Painel de Atalhos -->
+  <div id="shortcuts" class="panel shortcuts-panel hidden">
+    <div class="panel-header">
+      <h3>Atalhos de Teclado</h3>
+      <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')">
+        ×
+      </button>
     </div>
 
-    <!-- Shortcuts Panel -->
-    <div id="shortcuts" class="panel shortcuts-panel hidden">
-      <div class="panel-header">
-        <h3>Atalhos de Teclado</h3>
-        <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')" aria-label="Fechar">×</button>
-      </div>
-      <div class="panel-content">
-        <div class="shortcut-item">
-          <kbd>1-0</kbd>
-          <span>Selecionar cubos 2017–2026</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>Esc</kbd>
-          <span>Sair do zoom</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>Space</kbd>
-          <span>Pausar/Reproduzir animação</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>H</kbd>
-          <span>Para mostrar/ocultar atalhos</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>Mouse</kbd>
-          <span>Hover + Click para interagir</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>Wheel</kbd>
-          <span>Zoom da câmera</span>
-        </div>
-        <div class="shortcut-item">
-          <kbd>Voice</kbd>
-          <span>Diz "one"-"nine" para navegar</span>
-        </div>
-      </div>
+    <div class="panel-content">
+      <div class="shortcut-item"><kbd>1-0</kbd> <span>Selecionar anos 2017–2026</span></div>
+      <div class="shortcut-item"><kbd>Esc</kbd> <span>Sair do zoom</span></div>
+      <div class="shortcut-item"><kbd>Space</kbd> <span>Pausar animação</span></div>
+      <div class="shortcut-item"><kbd>H</kbd> <span>Mostrar/Ocultar atalhos</span></div>
+      <div class="shortcut-item"><kbd>Mouse</kbd> <span>Hover + Clique</span></div>
+      <div class="shortcut-item"><kbd>Wheel</kbd> <span>Zoom</span></div>
+      <div class="shortcut-item"><kbd>Voice</kbd> <span>Comandos "one"-"nine"</span></div>
     </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="scripts/data/yearData.js"></script>
+  <script src="scripts/classes/CursorParticle.js"></script>
+  <script src="scripts/classes/Planet.js"></script>
+  <script src="scripts/systems/ml5.js"></script>
+  <script src="scripts/sketch.js"></script>
+  <script src="scripts/ui/ui.js"></script>
 
     <script>
-      // Toggle shortcuts panel
-      document.getElementById('help-toggle').addEventListener('click', function() {
-        const panel = document.getElementById('shortcuts');
-        panel.classList.toggle('hidden');
-      });
-
-      // Hide shortcuts when clicking outside
-      document.addEventListener('click', function(e) {
-        const shortcuts = document.getElementById('shortcuts');
-        const helpBtn = document.getElementById('help-toggle');
-        
-        if (!shortcuts.contains(e.target) && e.target !== helpBtn && !helpBtn.contains(e.target)) {
-          shortcuts.classList.add('hidden');
-        }
-      });
+      lucide.createIcons();
     </script>
-  </body>
+</body>
 </html>

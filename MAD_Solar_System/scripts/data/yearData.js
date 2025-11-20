@@ -1,30 +1,4 @@
-// Global configuration and constants
-export const CONFIG = {
-  // Loading
-  ASSETS_TO_LOAD: 11,
-  
-  // Stars
-  NUM_STARS: 200,
-  STAR_FIELD_SIZE: 3000,
-  
-  // Sun
-  SUN_RADIUS: 80,
-  
-  // Planets
-  NUM_PLANETS: 10,
-  
-  // Cursor particles
-  MAX_CURSOR_PARTICLES: 60,
-  
-  // Camera
-  INITIAL_CAMERA: {
-    x: 0,
-    y: -800,
-    z: 2000
-  }
-};
-
-export const YEAR_DATA = [
+const yearData = [
   {year:2017,theme:"Tema Surpresa",color:{r:120,g:120,b:120},description:"1.ª edição do MAD Game Jam integrada na Semana Aberta da ESMAD (8–9 abril). O início de tudo.",details:"A primeira edição marcou o início de uma tradição criativa. Realizada presencialmente na ESMAD, reuniu estudantes e criativos para um fim de semana intenso de desenvolvimento de jogos."},
   {year:2018,theme:"Gravidade",color:{r:150,g:160,b:180},description:"2.ª edição com o tema 'Gravidade'. Jogo vencedor: Neon Switch.",details:"As equipas exploraram mecânicas gravitacionais inovadoras. O tema inspirou jogos com física interessante e puzzles desafiantes que brincavam com o conceito de gravidade invertida."},
   {year:2019,theme:"Tema Surpresa",color:{r:60,g:50,b:80},description:"3.ª edição realizada de 22–24 fevereiro. Manteve a tradição do tema surpresa.",details:"Um evento de 3 dias cheio de criatividade. O tema manteve-se secreto até ao início, criando um ambiente de surpresa e adaptação rápida."},

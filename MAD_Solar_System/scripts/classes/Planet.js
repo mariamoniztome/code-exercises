@@ -1,4 +1,4 @@
-export class Planet {
+class Planet {
   constructor(orbitRadius, size, speed, yearData, index) {
     this.orbitRadius = orbitRadius;
     this.size = size;
@@ -37,7 +37,7 @@ export class Planet {
   }
 
   update() {
-    if(!window.isPaused){
+    if(!isPaused){
       this.angle+=this.speed;
       this.rotationX+=0.005;
       this.rotationY+=0.008;
@@ -50,7 +50,7 @@ export class Planet {
         if(p.twinkle!==undefined)p.twinkle+=0.1;
       }
     }
-    if(this===window.hoveredPlanet){
+    if(this===hoveredPlanet){
       this.hoverScale=lerp(this.hoverScale,1.2,0.15);
       this.glowIntensity=lerp(this.glowIntensity,1,0.15);
     } else {
@@ -76,6 +76,13 @@ export class Planet {
     translate(x,0,z);
     scale(this.hoverScale);
     
+    // Update image index every second
+    const now = millis();
+    if (now - lastImageChange > IMAGE_CHANGE_INTERVAL) {
+      currentImageIndex = (currentImageIndex + 1) % 8; // Cycle through 8 images (0-7)
+      lastImageChange = now;
+    }
+    
     if(this.glowIntensity>0.1){
       push();
       noFill();
@@ -97,10 +104,12 @@ export class Planet {
     rotateY(this.rotationY);
     rotateZ(this.rotationZ);
     
-    if(window.globalColorTint)tint(window.globalColorTint);
+    if(globalColorTint)tint(globalColorTint);
     
     push();
-    texture(window.planetTextures[this.index]);
+    // Use currentImageIndex to cycle through the first 8 images
+    const textureIndex = this.index % 8; // Ensure we only use first 8 textures
+    texture(planetTextures[textureIndex]);
     if(this.glowIntensity>0.1)
       emissiveMaterial(
         this.yearData.color.r*this.glowIntensity*0.4,
