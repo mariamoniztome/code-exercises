@@ -209,18 +209,62 @@ function drawStars() {
 }
 
 function draw() {
-  background(5, 5, 15);
-  ambientLight(30); // luz ambiente suave
-  pointLight(
-    255,
-    235,
-    180, // cor quente do Sol
-    0,
-    0,
-    0 // posição (mesmo no sol)
-  );
+  // ============================================================
+  // 1) Atualiza ciclo solar pela mão (dia → sunset → noite)
+  // ============================================================
+  updateSunCycle();
 
-  // Sound
+  // ============================================================
+  // 2) Fundo fixo do espaço
+  // ============================================================
+  background(5, 5, 15);
+
+  // ============================================================
+  // 3) Cor da luz solar (noite → sunset → dia)
+  // ============================================================
+  const nightColor = { r: 80, g: 120, b: 255 }; // azul noturno
+  const sunsetColor = { r: 255, g: 120, b: 180 }; // rosa sunset
+  const dayColor = { r: 255, g: 255, b: 200 }; // branco-dia
+
+  let solarColor;
+
+  if (sunProgress < 0.5) {
+    // noite → pôr do sol
+    solarColor = {
+      r: lerp(nightColor.r, sunsetColor.r, sunProgress * 2),
+      g: lerp(nightColor.g, sunsetColor.g, sunProgress * 2),
+      b: lerp(nightColor.b, sunsetColor.b, sunProgress * 2),
+    };
+  } else {
+    // pôr do sol → dia
+    solarColor = {
+      r: lerp(sunsetColor.r, dayColor.r, (sunProgress - 0.5) * 2),
+      g: lerp(sunsetColor.g, dayColor.g, (sunProgress - 0.5) * 2),
+      b: lerp(sunsetColor.b, dayColor.b, (sunProgress - 0.5) * 2),
+    };
+  }
+
+  // ============================================================
+  // 4) Luz solar dinâmica
+  // ============================================================
+  let intensity = lerp(0.2, 1.4, sunProgress);
+
+  // Combinar cor + intensidade
+  const lr = solarColor.r * intensity;
+  const lg = solarColor.g * intensity;
+  const lb = solarColor.b * intensity;
+
+  // Luz ambiente muito leve (para sombras realistas)
+  ambientLight(5);
+
+  // Aumentar força criando várias pointLights
+  for (let i = 0; i < 3; i++) {
+    pointLight(lr, lg, lb, 0, 0, 0);
+  }
+
+  // ============================================================
+  // 5) Som dinâmico
+  // ============================================================
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
       spaceSound.setVolume(0.1);
@@ -231,7 +275,9 @@ function draw() {
     }
   }
 
-  // HOVER DETECTION
+  // ============================================================
+  // 6) Hover detection
+  // ============================================================
   if (!isZoomedIn) {
     hoveredPlanet = null;
     for (let p of planets) {
@@ -239,10 +285,10 @@ function draw() {
       let py = 0;
       let pz = sin(p.angle) * p.orbitRadius;
 
-      let cd = dist(camX, camY, camZ, 0, 0, 0);
       let pf = 1000 / (1000 + pz - camZ);
       let sx = width / 2 + (px - camX) * pf;
       let sy = height / 2 + (py - camY) * pf;
+
       let d = dist(mouseX, mouseY, sx, sy);
       let ha = p.size * pf * 1.5;
 
@@ -251,11 +297,11 @@ function draw() {
         break;
       }
     }
-  } else {
-    hoveredPlanet = null;
-  }
+  } else hoveredPlanet = null;
 
-  // Camera
+  // ============================================================
+  // 7) Camera tracking
+  // ============================================================
   if (isZoomedIn && selectedPlanet) {
     let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
@@ -276,48 +322,53 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // Stars
-  if (!isZoomedIn) {
-    push();
-    noStroke();
-    fill(255);
-    pop();
-  }
-
+  // ============================================================
+  // 8) Estrelas
+  // ============================================================
   autoAdjustStars();
   drawStars();
-  // Lighting
 
-  directionalLight(150, 150, 170, 0.4, -0.3, -0.2);
-
-  // Sun
+  // ============================================================
+  // 9) Sol (agora dinâmico)
+  // ============================================================
   if (!isZoomedIn) {
     push();
     noStroke();
-    ambientMaterial(255, 200, 120); // base quente, sem explosão
-    emissiveMaterial(80, 60, 20);
+    ambientMaterial(solarColor.r, solarColor.g, solarColor.b);
+
+    // Sol brilha mais quando é dia
+    emissiveMaterial(
+      solarColor.r * intensity * 0.6,
+      solarColor.g * intensity * 0.6,
+      solarColor.b * intensity * 0.6
+    );
+
     sphere(SUN_RADIUS, 48, 36);
     pop();
   }
 
-  // Orbits
+  // ============================================================
+  // 10) Órbitas
+  // ============================================================
   if (!isZoomedIn) {
     for (let p of planets) {
       p.drawOrbit();
     }
   }
 
-  // Planets
+  // ============================================================
+  // 11) Planetas
+  // ============================================================
   for (let p of planets) {
     if (!isPaused) p.update();
-    if (isZoomedIn) {
-      if (p === selectedPlanet) p.display();
-    } else {
+    if (!isZoomedIn || p === selectedPlanet) {
       p.display();
     }
   }
 
-  // Cursor particles
+  // ============================================================
+  // 12) Cursor particles
+  // ============================================================
   for (let i = cursorParticles.length - 1; i >= 0; i--) {
     const ps = cursorParticles[i];
     ps.update();
@@ -325,12 +376,16 @@ function draw() {
     if (ps.isDead()) cursorParticles.splice(i, 1);
   }
 
-  // Global effects
+  // ============================================================
+  // 13) Face API global lighting effects
+  // ============================================================
   globalBrightness = lerp(globalBrightness, 1.0, 0.05);
+
   if (globalColorTint) {
     let r = lerp(red(globalColorTint), 255, 0.05);
     let g = lerp(green(globalColorTint), 255, 0.05);
     let b = lerp(blue(globalColorTint), 255, 0.05);
+
     if (abs(r - 255) < 5 && abs(g - 255) < 5 && abs(b - 255) < 5) {
       globalColorTint = null;
     } else {
@@ -338,12 +393,16 @@ function draw() {
     }
   }
 
-  // TOOLTIP HOVER
+  // ============================================================
+  // 14) Tooltip hover
+  // ============================================================
   if (hoveredPlanet && !isZoomedIn) {
     drawHoverTooltip();
   }
 
-  // Webcam
+  // ============================================================
+  // 15) Webcam preview
+  // ============================================================
   if (video && video.loadedmetadata) {
     push();
     resetMatrix();

@@ -8,7 +8,14 @@ let video;
 let detections = [];
 let poses = [];
 
-// SOUND CLASSIFIER -------------------------------------------------------
+// Variável global que o sketch.js irá usar para o nascer/pôr-do-sol
+// 0 = pôr-do-sol / 1 = nascer do sol
+let sunProgress = 0.5;
+
+
+// ---------------------------------------------------------------------
+// 1) SOUND CLASSIFIER
+// ---------------------------------------------------------------------
 
 function setupSoundClassifier() {
   if (typeof ml5 === "undefined") {
@@ -17,6 +24,7 @@ function setupSoundClassifier() {
   }
 
   console.log("Sound Classifier...");
+
   soundClassifier = ml5.soundClassifier(
     "SpeechCommands18w",
     { probabilityThreshold: 0.85 },
@@ -41,6 +49,7 @@ function gotCommand(error, results) {
 
   console.log(`Comando: ${label}`);
 
+  // Navegação por voz
   if (label === "zero") selectPlanetByIndex(9);
   else if (label === "one") selectPlanetByIndex(0);
   else if (label === "two") selectPlanetByIndex(1);
@@ -51,12 +60,16 @@ function gotCommand(error, results) {
   else if (label === "seven") selectPlanetByIndex(6);
   else if (label === "eight") selectPlanetByIndex(7);
   else if (label === "nine") selectPlanetByIndex(8);
+
   else if (label === "stop") unselectPlanet();
   else if (label === "go") isPaused = !isPaused;
 }
 
 
-// FACE API -------------------------------------------------------
+
+// ---------------------------------------------------------------------
+// 2) FACE API (mantido igual)
+// ---------------------------------------------------------------------
 
 function setupFaceApi() {
   if (typeof ml5 === "undefined") {
@@ -105,6 +118,7 @@ function gotFace(error, result) {
     }
   }
 
+  // Color grading por expressão facial
   if (maxV > 0.7) {
     if (maxE === "happy") {
       globalBrightness = 1.8;
@@ -126,7 +140,9 @@ function gotFace(error, result) {
 
 
 
-// POSENET -------------------------------------------------------
+// ---------------------------------------------------------------------
+// 3) POSENET — atualizado para mão esquerda/direita
+// ---------------------------------------------------------------------
 
 function setupPoseNet() {
   if (typeof ml5 === "undefined" || !video) {
@@ -143,18 +159,60 @@ function poseModelReady() {
   console.log("PoseNet pronto");
 }
 
+
+
+// ✋ NOVO: Função para obter a posição da mão
+// Retorna X normalizado entre 0–640 OU null se nenhuma mão for detetada
+function getHandX() {
+  if (poses.length === 0) return null;
+
+  const pose = poses[0].pose;
+
+  const right = pose.rightWrist;
+  const left = pose.leftWrist;
+
+  // Prioridade à mão direita
+  if (right.confidence > 0.4) return right.x;
+  if (left.confidence > 0.4) return left.x;
+
+  return null;
+}
+
+
+function getHandY() {
+  if (poses.length === 0) return null;
+
+  const pose = poses[0].pose;
+
+  const right = pose.rightWrist;
+  const left = pose.leftWrist;
+
+  // prioridade à mão direita
+  if (right.confidence > 0.4) return right.y;
+  if (left.confidence > 0.4) return left.y;
+
+  return null;
+}
+
+
+// 🆕 NOVO: Atualiza o sunProgress automaticamente baseado na mão
+function updateSunCycle() {
+  const y = getHandY();
+  if (y === null) return;
+
+  // y=0 (topo)->1 (dia), y=480 (baixo)->0 (noite)
+  let target = map(y, 0, 480, 1, 0);
+  target = constrain(target, 0, 1);
+
+  sunProgress = lerp(sunProgress, target, 0.1); // movimento suave
+}
+
+
+
+
+// A tua função original de PoseNet agora só atualiza "poses"
 function gotPoses(results) {
   if (results.length === 0) return;
 
   poses = results;
-  const nose = results[0].pose.nose;
-  const conf = results[0].pose.keypoints.find(k => k.part === "nose")?.score || 0;
-
-  // Controla camera com nariz
-  if (conf > 0.5 && !isZoomedIn) {
-    const nx = map(nose.x, 0, 640, -200, 200);
-    const ny = map(nose.y, 0, 480, -200, 200);
-    targetX = nx;
-    targetY = ny - 800;
-  }
 }
