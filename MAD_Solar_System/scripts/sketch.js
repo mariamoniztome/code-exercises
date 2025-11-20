@@ -33,10 +33,6 @@ let targetX = 0,
 
 let planetTextures = [];
 
-// Cursor particles
-let cursorParticles = [];
-const MAX_CURSOR_PARTICLES = 60;
-
 let globalBrightness = 1.0;
 let globalColorTint = null;
 
@@ -367,16 +363,6 @@ function draw() {
   }
 
   // ============================================================
-  // 12) Cursor particles
-  // ============================================================
-  for (let i = cursorParticles.length - 1; i >= 0; i--) {
-    const ps = cursorParticles[i];
-    ps.update();
-    ps.drawScreen();
-    if (ps.isDead()) cursorParticles.splice(i, 1);
-  }
-
-  // ============================================================
   // 13) Face API global lighting effects
   // ============================================================
   globalBrightness = lerp(globalBrightness, 1.0, 0.05);
@@ -443,21 +429,5 @@ function mouseWheel(event) {
     targetZ += event.delta * 2;
     targetZ = constrain(targetZ, 600, 5000);
   }
-  return false;
-}
-
-function mouseMoved() {
-  // Criar partículas do cursor
-  if (cursorParticles.length < MAX_CURSOR_PARTICLES) {
-    const vx = random(-2, 2) + (pmouseX - mouseX) * 0.05;
-    const vy = random(-2, 2) + (pmouseY - mouseY) * 0.05;
-    cursorParticles.push(
-      new CursorParticle(mouseX, mouseY, -vx * 1.4, -vy * 1.4)
-    );
-  }
-}
-
-function touchMoved() {
-  mouseMoved();
   return false;
 }
