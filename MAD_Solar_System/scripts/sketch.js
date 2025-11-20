@@ -4,14 +4,11 @@ let volume = 0.5;
 let soundEnabled = true;
 let soundButton;
 
-// Loading
-let isLoading = true;
-let loadProgress = 0;
-let assetsToLoad = 11;
-let assetsLoaded = 0;
-
 // Estrelas
 let stars = [];
+let TARGET_FPS = 60;
+const STAR_MIN = 500;
+const STAR_MAX = 5000;
 const NUM_STARS = 5000;
 const STAR_FIELD_SIZE = 3000;
 
@@ -36,7 +33,7 @@ let targetX = 0,
 
 let planetTextures = [];
 
-// Cursor particles MELHORADAS
+// Cursor particles
 let cursorParticles = [];
 const MAX_CURSOR_PARTICLES = 60;
 
@@ -49,10 +46,25 @@ let lastImageChange = 0;
 const IMAGE_CHANGE_INTERVAL = 1000; // Change image every second
 
 // ---------------------- FUNÇÕES GLOBAIS ----------------------
+function autoAdjustStars() {
+  const fps = frameRate();
 
-function incrementLoadProgress() {
-  assetsLoaded++;
-  loadProgress = assetsLoaded / assetsToLoad;
+  // Se o FPS está muito abaixo, remover algumas estrelas
+  if (fps < TARGET_FPS * 0.8 && stars.length > STAR_MIN) {
+    stars.splice(0, 20); // remove 20 por frame
+  }
+
+  // Se o FPS está ótimo, adicionar mais estrelas
+  if (fps > TARGET_FPS * 0.95 && stars.length < STAR_MAX) {
+    for (let i = 0; i < 30; i++) {
+      // adiciona 30 por frame
+      stars.push({
+        x: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+        y: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+        z: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+      });
+    }
+  }
 }
 
 function selectPlanetByIndex(idx) {
@@ -84,14 +96,7 @@ function unselectPlanet() {
 }
 
 function preload() {
-  spaceSound = loadSound(
-    "assets/sounds/space.mp3",
-    () => incrementLoadProgress(),
-    (err) => {
-      console.error(err);
-      incrementLoadProgress();
-    }
-  );
+  spaceSound = loadSound("assets/sounds/space.mp3");
 
   const urls = [
     "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWJzZDd6ZTExd3l0NW9iMnh3aDR3dnVoNHg5MWwwNXJhZm85NGowdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PidSzdflbzd1sksap9/giphy.gif",
@@ -109,10 +114,11 @@ function preload() {
   urls.forEach((url, i) => {
     planetTextures[i] = loadImage(
       url,
-      () => incrementLoadProgress(),
-      (err) => {
-        console.error(err);
-        incrementLoadProgress();
+      () => {},
+      () => {
+        console.warn(
+          `Falha ao carregar textura do planeta ${i} de URL: ${url}`
+        );
       }
     );
   });
@@ -141,7 +147,6 @@ function setup() {
   }
 
   setTimeout(() => {
-    isLoading = false;
     if (spaceSound && !spaceSound.isPlaying()) {
       spaceSound.loop();
       spaceSound.setVolume(0.5);
@@ -193,6 +198,21 @@ function setup() {
   setupPoseNet();
 }
 
+function drawStars() {
+  push();
+  noStroke();
+  fill(255);
+
+  for (let s of stars) {
+    push();
+    translate(s.x, s.y, s.z);
+    sphere(1.5, 6, 4);
+    pop();
+  }
+
+  pop();
+}
+
 function draw() {
   background(5, 5, 15);
   ambientLight(30); // luz ambiente suave
@@ -204,11 +224,6 @@ function draw() {
     0,
     0 // posição (mesmo no sol)
   );
-
-  if (isLoading) {
-    drawLoadingScreen();
-    return;
-  }
 
   // Sound
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
@@ -271,15 +286,11 @@ function draw() {
     push();
     noStroke();
     fill(255);
-    for (let s of stars) {
-      push();
-      translate(s.x, s.y, s.z);
-      sphere(1.5, 6, 4);
-      pop();
-    }
     pop();
   }
 
+  autoAdjustStars();
+  drawStars();
   // Lighting
 
   directionalLight(150, 150, 170, 0.4, -0.3, -0.2);
@@ -347,44 +358,6 @@ function draw() {
     rect(0, 0, 160, 120);
     pop();
   }
-}
-
-function drawLoadingScreen() {
-  push();
-  resetMatrix();
-  translate(0, 0);
-  background(0);
-
-  fill(255);
-  textSize(48);
-  textAlign(CENTER, CENTER);
-  textFont("Arial");
-  text("MAD SOLAR SYSTEM", 0, -100);
-
-  textSize(18);
-  fill(200);
-  text("Festival MAD 2017–2025", 0, -60);
-
-  let bw = 400;
-  let bh = 8;
-  noStroke();
-  fill(50);
-  rectMode(CENTER);
-  rect(0, 40, bw, bh, 4);
-
-  fill(100, 200, 255);
-  rect(0, 40, bw * loadProgress, bh, 4);
-
-  textSize(16);
-  fill(150);
-  text(`${floor(loadProgress * 100)}%`, 0, 80);
-
-  let dots = ".".repeat(floor((frameCount / 20) % 4));
-  textSize(14);
-  fill(120);
-  text(`A carregar${dots}`, 0, 120);
-
-  pop();
 }
 
 function drawHoverTooltip() {
