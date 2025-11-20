@@ -1,5 +1,5 @@
 let lastImageChange = 0;
-const IMAGE_CHANGE_INTERVAL = 1000; // Change image every second
+const IMAGE_CHANGE_INTERVAL = 1000;
 let currentImageIndex = 0;
 
 class Planet {
@@ -104,13 +104,14 @@ class Planet {
     translate(x, 0, z);
     scale(this.hoverScale);
 
-    // Update image index every second
+    // (opcional) animação temporal global
     const now = millis();
     if (now - lastImageChange > IMAGE_CHANGE_INTERVAL) {
-      currentImageIndex = (currentImageIndex + 1) % 8; // Cycle through 8 images (0-7)
+      currentImageIndex = (currentImageIndex + 1) % 8;
       lastImageChange = now;
     }
 
+    // Glow geométrico quando hover
     if (this.glowIntensity > 0.1) {
       push();
       noFill();
@@ -142,16 +143,25 @@ class Planet {
     rotateY(this.rotationY);
     rotateZ(this.rotationZ);
 
+    // -------- MATERIAL REALISTA (luz do Sol) --------
     push();
-    // Use currentImageIndex to cycle through the first 8 images
-    const textureIndex = this.index % 8; // Ensure we only use first 8 textures
-    texture(planetTextures[textureIndex]);
-    if (this.glowIntensity > 0.1)
+
+    // cor especular branca (reflexo do sol)
+    specularMaterial(255);
+    shininess(80);
+
+    // textura do planeta (GIFs carregados no preload)
+    texture(planetTextures[this.index % 8]);
+
+    // um bocadinho de emissão quando hover
+    if (this.glowIntensity > 0.1) {
       emissiveMaterial(
-        this.yearData.color.r * this.glowIntensity * 0.4,
-        this.yearData.color.g * this.glowIntensity * 0.4,
-        this.yearData.color.b * this.glowIntensity * 0.4
+        this.yearData.color.r * this.glowIntensity * 0.3,
+        this.yearData.color.g * this.glowIntensity * 0.3,
+        this.yearData.color.b * this.glowIntensity * 0.3
       );
+    }
+
     box(this.size);
     pop();
 

@@ -1,3 +1,7 @@
+// ===============================
+// MAD SOLAR SYSTEM — sketch.js
+// ===============================
+
 // Som
 let spaceSound;
 let volume = 0.5;
@@ -14,6 +18,8 @@ const STAR_FIELD_SIZE = 3000;
 
 // Sol
 const SUN_RADIUS = 80;
+// solarColor é global para também ser usado visualmente nos planetas
+let solarColor = { r: 255, g: 210, b: 80 };
 
 // Planetas
 let planets = [];
@@ -31,21 +37,20 @@ let targetX = 0,
   targetY = -800,
   targetZ = 2000;
 
+// Texturas dos planetas
 let planetTextures = [];
 
 // ---------------------- FUNÇÕES GLOBAIS ----------------------
+
 function autoAdjustStars() {
   const fps = frameRate();
 
-  // Se o FPS está muito abaixo, remover algumas estrelas
   if (fps < TARGET_FPS * 0.8 && stars.length > STAR_MIN) {
-    stars.splice(0, 20); // remove 20 por frame
+    stars.splice(0, 20);
   }
 
-  // Se o FPS está ótimo, adicionar mais estrelas
   if (fps > TARGET_FPS * 0.95 && stars.length < STAR_MAX) {
     for (let i = 0; i < 30; i++) {
-      // adiciona 30 por frame
       stars.push({
         x: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
         y: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
@@ -83,6 +88,8 @@ function unselectPlanet() {
   console.log("🔙 Voltando");
 }
 
+// ---------------------- PRELOAD & SETUP ----------------------
+
 function preload() {
   spaceSound = loadSound("assets/sounds/space.mp3");
 
@@ -116,12 +123,15 @@ function setup() {
   frameRate(60);
   createCanvas(windowWidth, windowHeight, WEBGL);
   camera(0, -800, 2000);
-  video = createCapture(VIDEO);
-  video.size(640, 480);
-  video.hide();
   textureMode(NORMAL);
   textureWrap(REPEAT, REPEAT);
 
+  // Vídeo para PoseNet (o ml5.js já declara "let video")
+  video = createCapture(VIDEO);
+  video.size(640, 480);
+  video.hide();
+
+  // Estrelas
   for (let i = 0; i < NUM_STARS; i++) {
     stars.push({
       x: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
@@ -130,13 +140,15 @@ function setup() {
     });
   }
 
+  // Planetas
   let sizes = [50, 55, 50, 70, 55, 60, 52, 75, 58, 90];
   for (let i = 0; i < NUM_PLANETS; i++) {
     planets.push(
-      new Planet(200 + i * 100, sizes[i], random(0.002, 0.008), yearData[i], i)
+      new Planet(200 + i * 100, sizes[i], random(0.002, 0.006), yearData[i], i)
     );
   }
 
+  // Som
   setTimeout(() => {
     if (spaceSound && !spaceSound.isPlaying()) {
       spaceSound.loop();
@@ -147,6 +159,7 @@ function setup() {
   soundButton = document.getElementById("sound-toggle");
   if (soundButton) soundButton.addEventListener("click", toggleSound);
 
+  // Atalhos de teclado
   window.addEventListener("keydown", (e) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -184,14 +197,20 @@ function setup() {
     }
   });
 
-  setupSoundClassifier();
+  // ML5
   setupPoseNet();
+  setupSoundClassifier();
 }
+
+// ---------------------- DRAW HELPERS ----------------------
 
 function drawStars() {
   push();
   noStroke();
-  fill(255);
+
+  // Estrelas brilham mais à noite
+  const starBrightness = map(1 - sunProgress, 0, 1, 40, 255);
+  fill(starBrightness);
 
   for (let s of stars) {
     push();
@@ -203,63 +222,64 @@ function drawStars() {
   pop();
 }
 
+// ---------------------- MAIN DRAW ----------------------
+
 function draw() {
-  // ============================================================
-  // 1) Atualiza ciclo solar pela mão (dia → sunset → noite)
-  // ============================================================
+  // 1) Atualiza ciclo solar pela mão (PoseNet em ml5.js)
   updateSunCycle();
 
-  // ============================================================
-  // 2) Fundo fixo do espaço
-  // ============================================================
+  // 2) Fundo do espaço
   background(5, 5, 15);
 
-  // ============================================================
-  // 3) Cor da luz solar (noite → sunset → dia)
-  // ============================================================
-  const nightColor = { r: 80, g: 120, b: 255 }; // azul noturno
-  const sunsetColor = { r: 255, g: 120, b: 180 }; // rosa sunset
-  const dayColor = { r: 255, g: 255, b: 200 }; // branco-dia
-
-  let solarColor;
+  // 3) Cor do sol (noite → sunset → dia)
+  const nightColor = { r: 40, g: 60, b: 120 };   // azul frio
+  const sunsetColor = { r: 255, g: 140, b: 60 }; // laranja quente
+  const dayColor = { r: 255, g: 210, b: 80 };    // amarelo sol
 
   if (sunProgress < 0.5) {
     // noite → pôr do sol
+    const t = sunProgress * 2;
     solarColor = {
-      r: lerp(nightColor.r, sunsetColor.r, sunProgress * 2),
-      g: lerp(nightColor.g, sunsetColor.g, sunProgress * 2),
-      b: lerp(nightColor.b, sunsetColor.b, sunProgress * 2),
+      r: lerp(nightColor.r, sunsetColor.r, t),
+      g: lerp(nightColor.g, sunsetColor.g, t),
+      b: lerp(nightColor.b, sunsetColor.b, t),
     };
   } else {
     // pôr do sol → dia
+    const t = (sunProgress - 0.5) * 2;
     solarColor = {
-      r: lerp(sunsetColor.r, dayColor.r, (sunProgress - 0.5) * 2),
-      g: lerp(sunsetColor.g, dayColor.g, (sunProgress - 0.5) * 2),
-      b: lerp(sunsetColor.b, dayColor.b, (sunProgress - 0.5) * 2),
+      r: lerp(sunsetColor.r, dayColor.r, t),
+      g: lerp(sunsetColor.g, dayColor.g, t),
+      b: lerp(sunsetColor.b, dayColor.b, t),
     };
   }
 
-  // ============================================================
-  // 4) Luz solar dinâmica
-  // ============================================================
-  let intensity = lerp(0.2, 1.4, sunProgress);
+  // 4) Luz solar dinâmica (apenas p5 3D real)
+  let intensity = lerp(0.3, 2.5, sunProgress); // bem forte de dia
+  let lr = solarColor.r * intensity;
+  let lg = solarColor.g * intensity;
+  let lb = solarColor.b * intensity;
 
-  // Combinar cor + intensidade
-  const lr = solarColor.r * intensity;
-  const lg = solarColor.g * intensity;
-  const lb = solarColor.b * intensity;
+  // Luz ambiente muito suave
+  ambientLight(10);
 
-  // Luz ambiente muito leve (para sombras realistas)
-  ambientLight(5);
+  // Luz direcional (como um sol ao fundo)
+  directionalLight(
+    lr,
+    lg,
+    lb,
+    0.5, -0.3, -0.4
+  );
 
-  // Aumentar força criando várias pointLights
-  for (let i = 0; i < 3; i++) {
-    pointLight(lr, lg, lb, 0, 0, 0);
-  }
+  // Luz pontual forte na posição do Sol (centro)
+  pointLight(
+    lr * 2,
+    lg * 2,
+    lb * 2,
+    0, 0, 0
+  );
 
-  // ============================================================
   // 5) Som dinâmico
-  // ============================================================
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
       spaceSound.setVolume(0.1);
@@ -270,9 +290,7 @@ function draw() {
     }
   }
 
-  // ============================================================
   // 6) Hover detection
-  // ============================================================
   if (!isZoomedIn) {
     hoveredPlanet = null;
     for (let p of planets) {
@@ -294,9 +312,7 @@ function draw() {
     }
   } else hoveredPlanet = null;
 
-  // ============================================================
   // 7) Camera tracking
-  // ============================================================
   if (isZoomedIn && selectedPlanet) {
     let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
@@ -317,43 +333,37 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // ============================================================
   // 8) Estrelas
-  // ============================================================
   autoAdjustStars();
   drawStars();
 
-  // ============================================================
-  // 9) Sol (agora dinâmico)
-  // ============================================================
+  // 9) Sol 3D (sem glow 2D)
   if (!isZoomedIn) {
     push();
     noStroke();
+
+    // Cor base do sol
     ambientMaterial(solarColor.r, solarColor.g, solarColor.b);
 
-    // Sol brilha mais quando é dia
+    // Emissão forte — faz o sol "queimar" a retina 😄
     emissiveMaterial(
-      solarColor.r * intensity * 0.6,
-      solarColor.g * intensity * 0.6,
-      solarColor.b * intensity * 0.6
+      solarColor.r * 4,
+      solarColor.g * 4,
+      solarColor.b * 4
     );
 
-    sphere(SUN_RADIUS, 48, 36);
+    sphere(SUN_RADIUS, 64, 48);
     pop();
   }
 
-  // ============================================================
   // 10) Órbitas
-  // ============================================================
   if (!isZoomedIn) {
     for (let p of planets) {
       p.drawOrbit();
     }
   }
 
-  // ============================================================
   // 11) Planetas
-  // ============================================================
   for (let p of planets) {
     if (!isPaused) p.update();
     if (!isZoomedIn || p === selectedPlanet) {
@@ -361,13 +371,13 @@ function draw() {
     }
   }
 
-  // ============================================================
-  // 14) Tooltip hover
-  // ============================================================
+  // 12) Tooltip hover
   if (hoveredPlanet && !isZoomedIn) {
     drawHoverTooltip();
   }
 }
+
+// ---------------------- INPUT ----------------------
 
 function mousePressed() {
   if (spaceSound && !spaceSound.isPlaying()) {
