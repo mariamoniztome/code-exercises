@@ -34,6 +34,33 @@ body {
 }
 
 
+.hand-cursor {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;   
+    align-items: flex-end;   
+    pointer-events: none;
+    z-index: 10000;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 400;
+    user-select: none;
+    animation: fadeIn 0.5s ease-out;
+}
+
+
+.hand-cursor img {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 0 6px rgba(255, 200, 80, 0.5));
+}
+
 .header {
   position: fixed;
   top: 20px;
@@ -82,7 +109,6 @@ body {
   line-height: 1;
 }
 
-/* PLANET INFO - Reduzido e mais discreto */
 .planet-info {
   position: fixed;
   bottom: 30px;
@@ -242,63 +268,6 @@ kbd {
   flex: 1;
   letter-spacing: -0.01em;
   font-weight: 400;
-}
-
-/* EASTER EGG NOTIFICATION */
-.easter-egg-notification {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  background: rgba(255, 215, 0, 0.95);
-  backdrop-filter: blur(20px);
-  padding: 24px 32px;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(255, 215, 0, 0.4),
-              0 0 80px rgba(255, 215, 0, 0.2);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  animation: eggAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transition: opacity 0.5s ease;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.egg-icon {
-  font-size: 40px;
-  animation: eggSpin 2s ease-in-out infinite;
-}
-
-.egg-text {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  max-width: 300px;
-  line-height: 1.4;
-}
-
-@keyframes eggAppear {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-@keyframes eggSpin {
-  0%, 100% {
-    transform: rotate(0deg) scale(1);
-  }
-  25% {
-    transform: rotate(-10deg) scale(1.1);
-  }
-  75% {
-    transform: rotate(10deg) scale(1.1);
-  }
 }
 
 @media (max-width: 768px) {
