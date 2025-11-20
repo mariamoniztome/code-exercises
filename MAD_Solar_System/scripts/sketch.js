@@ -14,7 +14,7 @@ const STAR_FIELD_SIZE = 3000;
 
 // Sol
 const SUN_RADIUS = 80;
-let solarColor = { r: 255, g: 210, b: 80 };
+let solarColor = { r: 251, g: 217, b: 70 };
 let sunHue = 30; // 0–360
 let sunBright = 1.0; // 0–1
 
@@ -256,7 +256,7 @@ function draw() {
   background(5, 5, 15);
 
   // sunHue vai de 0 a 360 controlado pela mão
-  let rgb = hslToRgb(sunHue, 1.0, 0.5); // saturação 100%, luz 50%
+  let rgb = hslToRgb(sunHue, 0.7, 0.5); // saturação 100%, luz 50%
   solarColor = rgb; // atualiza cor global do sol
 
   let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo

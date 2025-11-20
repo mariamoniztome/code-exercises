@@ -1,19 +1,10 @@
-// ---------------- ML5 SYSTEM ----------------
-
-// Referências globais usadas no sketch
 let soundClassifier;
 let poseNet;
 let video;
 let poses = [];
-
-// Variável global que o sketch.js irá usar para o nascer/pôr-do-sol
-// 0 = pôr-do-sol / 1 = nascer do sol
 let sunProgress = 0.5;
 
-// ---------------------------------------------------------------------
-// 1) SOUND CLASSIFIER
-// ---------------------------------------------------------------------
-
+// Sound Classifier
 function setupSoundClassifier() {
   if (typeof ml5 === "undefined") {
     console.warn("ml5 não carregado");
@@ -61,9 +52,7 @@ function gotCommand(error, results) {
   else if (label === "go") isPaused = !isPaused;
 }
 
-// ---------------------------------------------------------------------
-// 3) POSENET — atualizado para mão esquerda/direita
-// ---------------------------------------------------------------------
+// 3) PoseNet 
 function gotPoses(results) {
   if (results.length === 0) return;
   poses = results;   // atualiza a variável global usada no draw()
@@ -79,7 +68,6 @@ function poseModelReady() {
   console.log("PoseNet pronto");
 }
 
-// ✋ NOVO: Função para obter a posição da mão
 // Retorna X normalizado entre 0–640 OU null se nenhuma mão for detetada
 function getHandX() {
   if (poses.length === 0) return null;
@@ -120,5 +108,5 @@ function updateSunCycle() {
   sunHue = map(x, 0, 640, 0, 360);
 
   // brilho controla intensidade (mover vertical)
-  sunBright = map(y, 480, 0, 0.3, 2.5); // de escuro → muito brilhante
+  sunBright = map(y, 480, 0, 0.3, 2.5);
 }
