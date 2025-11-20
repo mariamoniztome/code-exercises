@@ -2,16 +2,13 @@
 
 // Referências globais usadas no sketch
 let soundClassifier;
-let faceApi;
 let poseNet;
 let video;
-let detections = [];
 let poses = [];
 
 // Variável global que o sketch.js irá usar para o nascer/pôr-do-sol
 // 0 = pôr-do-sol / 1 = nascer do sol
 let sunProgress = 0.5;
-
 
 // ---------------------------------------------------------------------
 // 1) SOUND CLASSIFIER
@@ -60,96 +57,15 @@ function gotCommand(error, results) {
   else if (label === "seven") selectPlanetByIndex(6);
   else if (label === "eight") selectPlanetByIndex(7);
   else if (label === "nine") selectPlanetByIndex(8);
-
   else if (label === "stop") unselectPlanet();
   else if (label === "go") isPaused = !isPaused;
 }
-
-
-
-// ---------------------------------------------------------------------
-// 2) FACE API (mantido igual)
-// ---------------------------------------------------------------------
-
-function setupFaceApi() {
-  if (typeof ml5 === "undefined") {
-    console.warn("ml5 não carregado");
-    return;
-  }
-
-  console.log("Face API...");
-  video = createCapture(VIDEO);
-  video.size(640, 480);
-  video.hide();
-
-  faceApi = ml5.faceApi(
-    video,
-    { withLandmarks: true, withDescriptors: false },
-    faceModelReady
-  );
-}
-
-function faceModelReady() {
-  console.log("Face pronto");
-  faceApi.detect(gotFace);
-}
-
-function gotFace(error, result) {
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  if (!result || result.length === 0) {
-    faceApi.detect(gotFace);
-    return;
-  }
-
-  detections = result;
-
-  const exp = result[0].expressions;
-  let maxE = "";
-  let maxV = 0;
-
-  for (let e in exp) {
-    if (exp[e] > maxV) {
-      maxV = exp[e];
-      maxE = e;
-    }
-  }
-
-  // Color grading por expressão facial
-  if (maxV > 0.7) {
-    if (maxE === "happy") {
-      globalBrightness = 1.8;
-      globalColorTint = color(255, 255, 200);
-    } else if (maxE === "sad") {
-      globalBrightness = 0.4;
-      globalColorTint = color(100, 100, 150);
-    } else if (maxE === "angry") {
-      globalBrightness = 1.2;
-      globalColorTint = color(255, 100, 100);
-    } else if (maxE === "surprised") {
-      globalBrightness = 2.0;
-      globalColorTint = color(255, 255, 255);
-    }
-  }
-
-  faceApi.detect(gotFace);
-}
-
-
 
 // ---------------------------------------------------------------------
 // 3) POSENET — atualizado para mão esquerda/direita
 // ---------------------------------------------------------------------
 
 function setupPoseNet() {
-  if (typeof ml5 === "undefined" || !video) {
-    console.warn("ml5 ou video não disponível");
-    return;
-  }
-
   console.log("PoseNet...");
   poseNet = ml5.poseNet(video, poseModelReady);
   poseNet.on("pose", gotPoses);
@@ -158,8 +74,6 @@ function setupPoseNet() {
 function poseModelReady() {
   console.log("PoseNet pronto");
 }
-
-
 
 // ✋ NOVO: Função para obter a posição da mão
 // Retorna X normalizado entre 0–640 OU null se nenhuma mão for detetada
@@ -178,7 +92,6 @@ function getHandX() {
   return null;
 }
 
-
 function getHandY() {
   if (poses.length === 0) return null;
 
@@ -194,7 +107,6 @@ function getHandY() {
   return null;
 }
 
-
 // 🆕 NOVO: Atualiza o sunProgress automaticamente baseado na mão
 function updateSunCycle() {
   const y = getHandY();
@@ -206,9 +118,6 @@ function updateSunCycle() {
 
   sunProgress = lerp(sunProgress, target, 0.1); // movimento suave
 }
-
-
-
 
 // A tua função original de PoseNet agora só atualiza "poses"
 function gotPoses(results) {

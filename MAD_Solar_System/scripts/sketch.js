@@ -33,9 +33,6 @@ let targetX = 0,
 
 let planetTextures = [];
 
-let globalBrightness = 1.0;
-let globalColorTint = null;
-
 // ---------------------- FUNÇÕES GLOBAIS ----------------------
 function autoAdjustStars() {
   const fps = frameRate();
@@ -119,6 +116,9 @@ function setup() {
   frameRate(60);
   createCanvas(windowWidth, windowHeight, WEBGL);
   camera(0, -800, 2000);
+  video = createCapture(VIDEO);
+  video.size(640, 480);
+  video.hide();
   textureMode(NORMAL);
   textureWrap(REPEAT, REPEAT);
 
@@ -185,7 +185,6 @@ function setup() {
   });
 
   setupSoundClassifier();
-  setupFaceApi();
   setupPoseNet();
 }
 
@@ -363,40 +362,10 @@ function draw() {
   }
 
   // ============================================================
-  // 13) Face API global lighting effects
-  // ============================================================
-  globalBrightness = lerp(globalBrightness, 1.0, 0.05);
-
-  if (globalColorTint) {
-    let r = lerp(red(globalColorTint), 255, 0.05);
-    let g = lerp(green(globalColorTint), 255, 0.05);
-    let b = lerp(blue(globalColorTint), 255, 0.05);
-
-    if (abs(r - 255) < 5 && abs(g - 255) < 5 && abs(b - 255) < 5) {
-      globalColorTint = null;
-    } else {
-      globalColorTint = color(r, g, b);
-    }
-  }
-
-  // ============================================================
   // 14) Tooltip hover
   // ============================================================
   if (hoveredPlanet && !isZoomedIn) {
     drawHoverTooltip();
-  }
-
-  // ============================================================
-  // 15) Webcam preview
-  // ============================================================
-  if (video && video.loadedmetadata) {
-    push();
-    resetMatrix();
-    translate(-width / 2 + 90, height / 2 - 100);
-    noStroke();
-    texture(video);
-    rect(0, 0, 160, 120);
-    pop();
   }
 }
 
