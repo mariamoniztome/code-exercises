@@ -73,13 +73,7 @@ class Planet {
         if (p.twinkle !== undefined) p.twinkle += 0.1;
       }
     }
-    if (this === hoveredPlanet) {
-      this.hoverScale = lerp(this.hoverScale, 1.2, 0.15);
-      this.glowIntensity = lerp(this.glowIntensity, 1, 0.15);
-    } else {
-      this.hoverScale = lerp(this.hoverScale, 1.0, 0.15);
-      this.glowIntensity = lerp(this.glowIntensity, 0, 0.15);
-    }
+
   }
 
   drawOrbit() {

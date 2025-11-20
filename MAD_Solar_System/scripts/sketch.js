@@ -1,7 +1,3 @@
-// ===============================
-// MAD SOLAR SYSTEM — sketch.js
-// ===============================
-
 // Som
 let spaceSound;
 let volume = 0.5;
@@ -18,7 +14,6 @@ const STAR_FIELD_SIZE = 3000;
 
 // Sol
 const SUN_RADIUS = 80;
-// solarColor é global para também ser usado visualmente nos planetas
 let solarColor = { r: 255, g: 210, b: 80 };
 let sunHue = 30; // 0–360
 let sunBright = 1.0; // 0–1
@@ -27,7 +22,7 @@ let sunBright = 1.0; // 0–1
 let planets = [];
 const NUM_PLANETS = 10;
 let selectedPlanet = null;
-let hoveredPlanet = null;
+// let hoveredPlanet = null;
 let isZoomedIn = false;
 let isPaused = false;
 
@@ -87,7 +82,7 @@ function unselectPlanet() {
   targetY = -800;
   targetZ = 2000;
   hidePlanetInfo();
-  console.log("🔙 Voltando");
+  console.log("Retorno à visão geral do sistema solar.");
 }
 
 // ---------------------- PRELOAD & SETUP ----------------------
@@ -128,7 +123,7 @@ function setup() {
   textureMode(NORMAL);
   textureWrap(REPEAT, REPEAT);
 
-  // Vídeo para PoseNet (o ml5.js já declara "let video")
+  // Vídeo para PoseNet 
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
@@ -256,22 +251,14 @@ function drawStars() {
 
 // ---------------------- MAIN DRAW ----------------------
 function draw() {
-  // 1) Atualiza ciclo solar pela mão (via PoseNet em ml5.js)
+  // Atualiza ciclo solar pela mão
   updateSunCycle();
-
-  // 2) Fundo do espaço
   background(5, 5, 15);
 
-  // ============================================================
-  // 🌈 3) SOL MULTICOLOR — HSL → RGB
   // sunHue vai de 0 a 360 controlado pela mão
-  // ============================================================
   let rgb = hslToRgb(sunHue, 1.0, 0.5); // saturação 100%, luz 50%
   solarColor = rgb; // atualiza cor global do sol
 
-  // ============================================================
-  // 🔥 4) LUZ SOLAR REAL 3D EM P5 — baseada na cor HSL
-  // ============================================================
   let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo
 
   let lr = solarColor.r * intensity;
@@ -280,16 +267,12 @@ function draw() {
 
   // Luz ambiente muito suave
   ambientLight(10);
-
   // Luz direcional (sol como um feixe a partir do topo-direita)
   directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
-
   // Luz pontual intensa (o brilho do sol propriamente dito)
   pointLight(lr * 2, lg * 2, lb * 2, 0, 0, 0);
 
-  // ============================================================
-  // 🔊 5) Som dinâmico
-  // ============================================================
+  // Som dinâmico
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
       spaceSound.setVolume(0.1);
@@ -300,33 +283,7 @@ function draw() {
     }
   }
 
-  // ============================================================
-  // 🪐 6) Hover detection
-  // ============================================================
-  if (!isZoomedIn) {
-    hoveredPlanet = null;
-    for (let p of planets) {
-      let px = cos(p.angle) * p.orbitRadius;
-      let py = 0;
-      let pz = sin(p.angle) * p.orbitRadius;
-
-      let pf = 1000 / (1000 + pz - camZ);
-      let sx = width / 2 + (px - camX) * pf;
-      let sy = height / 2 + (py - camY) * pf;
-
-      let d = dist(mouseX, mouseY, sx, sy);
-      let ha = p.size * pf * 1.5;
-
-      if (d < ha) {
-        hoveredPlanet = p;
-        break;
-      }
-    }
-  } else hoveredPlanet = null;
-
-  // ============================================================
-  // 🎥 7) Camera tracking
-  // ============================================================
+  // Camera tracking
   if (isZoomedIn && selectedPlanet) {
     let px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     let pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
@@ -347,16 +304,11 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // ============================================================
-  // ✨ 8) Estrelas
-  // ============================================================
+  // Estrelas
   autoAdjustStars();
   drawStars();
 
-  // ============================================================
-  // ☀️ 9) Sol 3D multicolor (sem glow 2D)
-  // ============================================================
-  // 9) Sol 3D multicolor (sem glow 2D)
+  // Sol
   if (!isZoomedIn) {
     push();
     noStroke();
@@ -374,7 +326,7 @@ function draw() {
     sphere(SUN_RADIUS, 64, 48);
     pop();
 
-    // CAMADA 3 — halo externo soft (aura celestial)
+    // CAMADA 3 — halo externo soft
     push();
     emissiveMaterial(base.r * 0.4, base.g * 0.4, base.b * 0.4);
     scale(1.6);
@@ -391,30 +343,19 @@ function draw() {
     pop();
   }
 
-  // ============================================================
-  // 🌓 10) Órbitas
-  // ============================================================
+  // Órbitas
   if (!isZoomedIn) {
     for (let p of planets) {
       p.drawOrbit();
     }
   }
 
-  // ============================================================
-  // 🌍 11) Planetas
-  // ============================================================
+  // Planetas
   for (let p of planets) {
     if (!isPaused) p.update();
     if (!isZoomedIn || p === selectedPlanet) {
       p.display();
     }
-  }
-
-  // ============================================================
-  // ℹ️ 12) Tooltip hover
-  // ============================================================
-  if (hoveredPlanet && !isZoomedIn) {
-    drawHoverTooltip();
   }
 }
 
@@ -426,15 +367,19 @@ function mousePressed() {
     spaceSound.setVolume(0.5);
   }
 
+  // Seleção simples por clique (SEM TOOLTIP)
   if (!isZoomedIn && hoveredPlanet) {
     selectedPlanet = hoveredPlanet;
     isZoomedIn = true;
+
     const px = cos(selectedPlanet.angle) * selectedPlanet.orbitRadius;
     const pz = sin(selectedPlanet.angle) * selectedPlanet.orbitRadius;
+
     targetX = px;
     targetY = 0;
     targetZ = pz + selectedPlanet.size * 1.5 + 150;
-    showPlanetInfo(selectedPlanet);
+
+    showPlanetInfo(selectedPlanet); // se também quiseres remover, digo-te como
   } else if (isZoomedIn) {
     unselectPlanet();
   }
