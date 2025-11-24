@@ -50,41 +50,6 @@ function hidePlanetInfo() {
   if (info) info.classList.add("hidden");
 }
 
-function drawHoverTooltip() {
-  push();
-  resetMatrix();
-
-  let tx = mouseX - width / 2;
-  let ty = mouseY - height / 2 - 60;
-  translate(tx, ty);
-
-  // Background colorido
-  fill(
-    hoveredPlanet.yearData.color.r,
-    hoveredPlanet.yearData.color.g,
-    hoveredPlanet.yearData.color.b,
-    230
-  );
-  stroke(255);
-  strokeWeight(3);
-  rectMode(CENTER);
-  rect(0, 0, 180, 70, 12);
-
-  // Ano
-  noStroke();
-  fill(255);
-  textSize(28);
-  textAlign(CENTER, CENTER);
-  textFont("Arial");
-  text(hoveredPlanet.yearData.year, 0, -12);
-
-  // Tema
-  textSize(14);
-  fill(255, 255, 255, 220);
-  text(hoveredPlanet.yearData.theme, 0, 15);
-
-  pop();
-}
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
