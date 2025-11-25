@@ -47,16 +47,68 @@ body {
     align-items: center;
     pointer-events: none;
     z-index: 10000;
-    padding: 0;
-    background: transparent;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
     user-select: none;
     transform-origin: bottom right;
+    transition: all 0.3s ease;
 }
 
 .hand-cursor img {
     width: 48px;
     height: 48px;
     filter: drop-shadow(0 0 6px rgba(255, 200, 80, 0.5));
+    pointer-events: none;
+}
+
+/* Speech bubble styles */
+.speech-bubble {
+    position: absolute;
+    top: -60px;
+    right: 100%;
+    margin-right: 15px;
+    background: white;
+    color: #333;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10001;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    border-width: 10px 8px 0;
+    border-style: solid;
+    border-color: white transparent transparent;
+}
+
+/* Show bubble */
+.hand-cursor.show-bubble .speech-bubble {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Hand animation */
+@keyframes handPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.hand-cursor.pulse {
+    animation: handPulse 2s infinite;
+    background: rgba(255, 200, 80, 0.3);
 }
 
 .header {
