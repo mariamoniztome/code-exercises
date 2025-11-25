@@ -4,124 +4,82 @@ class PartyMode {
     this.partyInterval = null;
     this.sunHue = 0;
     this.originalSunColor = { r: 251, g: 217, b: 70 };
-    
+
     this.initElements();
     this.addEventListeners();
   }
 
   initElements() {
     this.partyButton = document.getElementById('party-toggle');
-    this.partyModal = document.getElementById('party-modal');
-    this.partyYes = document.getElementById('party-yes');
-    this.partyNo = document.getElementById('party-no');
   }
 
   addEventListeners() {
-    // Toggle party mode modal
+    // Clicar no botão ativa/desativa diretamente o Party Mode
     this.partyButton.addEventListener('click', () => {
-      this.toggleModal(true);
+      this.togglePartyMode(!this.isPartyMode);
     });
 
-    // Party mode on
-    this.partyYes.addEventListener('click', () => {
-      this.togglePartyMode(true);
-      this.toggleModal(false);
-    });
-
-    // Party mode off
-    this.partyNo.addEventListener('click', () => {
-      this.toggleModal(false);
-    });
-
-    // Close modal when clicking outside
-    this.partyModal.addEventListener('click', (e) => {
-      if (e.target === this.partyModal) {
-        this.toggleModal(false);
-      }
-    });
-
-    // ESC key to exit party mode
+    // ESC também desliga
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (this.isPartyMode) {
-          this.togglePartyMode(false);
-        } else {
-          this.toggleModal(false);
-        }
+      if (e.key === 'Escape' && this.isPartyMode) {
+        this.togglePartyMode(false);
       }
     });
   }
 
-  toggleModal(show) {
-    if (show) {
-      this.partyModal.classList.add('visible');
-      // Focus the first button for better accessibility
-      setTimeout(() => this.partyYes.focus(), 100);
+  togglePartyMode(enable) {
+    this.isPartyMode = enable;
+    
+    if (enable) {
+      document.body.classList.add('party-mode');
+      this.startPartyEffects();
+      this.updatePlanetSpeeds(true);
     } else {
-      this.partyModal.classList.remove('visible');
+      document.body.classList.remove('party-mode');
+      this.stopPartyEffects();
+      this.updatePlanetSpeeds(false);
+
+      if (window.solarColor) {
+        window.solarColor = { ...this.originalSunColor };
+      }
     }
   }
 
-togglePartyMode(enable) {
-  this.isPartyMode = enable;
-  
-  if (enable) {
-    document.body.classList.add('party-mode');
-    this.startPartyEffects();
-    this.updatePlanetSpeeds(true); // Make planets spin faster
-  } else {
-    document.body.classList.remove('party-mode');
-    this.stopPartyEffects();
-    this.updatePlanetSpeeds(false); // Reset planet speeds
-    // Reset sun color to default
-    if (window.solarColor) {
-      window.solarColor = { ...this.originalSunColor };
-    }
+  startPartyEffects() {
+    this.partyInterval = setInterval(() => {
+      this.sunHue = (this.sunHue + 9) % 360;
+      const color = this.hslToRgb(this.sunHue / 360, 1, 0.6);
+
+      if (window.solarColor) {
+        window.solarColor = {
+          r: color.r * 255,
+          g: color.g * 255,
+          b: color.b * 255
+        };
+      }
+
+      if (window.partyLights) {
+        window.partyLights = {
+          r: color.r * 3.5 * 255,
+          g: color.g * 3.5 * 255,
+          b: color.b * 3.5 * 255
+        };
+      }
+    }, 30);
   }
-}
 
-// In partyMode.js, update the startPartyEffects method:
-startPartyEffects() {
-  // Start color cycling for the sun - faster updates
-  this.partyInterval = setInterval(() => {
-    this.sunHue = (this.sunHue + 9) % 360; // Increased from 2 to 5 for faster color changes
-
-    // Convert HSL to RGB for p5.js
-    const color = this.hslToRgb(this.sunHue / 360, 1, 0.6); // Increased brightness
-
-    // Update the global solarColor used in the draw function
-    if (window.solarColor) {
-      window.solarColor = {
-        r: color.r * 255,
-        g: color.g * 255,
-        b: color.b * 255
-      };
-    }
-
-    // Update the light colors as well - more intense
-    if (window.partyLights) {
-      window.partyLights = {
-        r: color.r * 3.5 * 255, // Increased from 2.5 to 3.5 for brighter lights
-        g: color.g * 3.5 * 255,
-        b: color.b * 3.5 * 255
-      };
-    }
-  }, 30); // Faster updates (reduced from 50ms to 30ms)
-}
-
-// Add this method to update planet speeds
-updatePlanetSpeeds(faster = true) {
-  if (!window.planets) return;
-  
-  window.planets.forEach(planet => {
-    if (faster) {
-      planet.originalSpeed = planet.speed; // Store original speed
-      planet.speed *= 3; // Triple the speed
-    } else if (planet.originalSpeed !== undefined) {
-      planet.speed = planet.originalSpeed; // Restore original speed
-    }
-  });
-}
+  updatePlanetSpeeds(faster = true) {
+    if (!window.planets) return;
+    
+    window.planets.forEach(planet => {
+      if (faster) {
+        planet.originalSpeed = planet.speed;
+        planet.speed *= 3;
+      } else if (planet.originalSpeed !== undefined) {
+        planet.speed = planet.originalSpeed;
+      }
+    });
+  }
 
   stopPartyEffects() {
     if (this.partyInterval) {
@@ -130,7 +88,6 @@ updatePlanetSpeeds(faster = true) {
     }
   }
 
-  // Helper function to convert HSL to RGB (returns values 0-1)
   hslToRgb(h, s, l) {
     let r, g, b;
 
@@ -158,7 +115,6 @@ updatePlanetSpeeds(faster = true) {
   }
 }
 
-// Initialize party mode when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.partyMode = new PartyMode();
 });
