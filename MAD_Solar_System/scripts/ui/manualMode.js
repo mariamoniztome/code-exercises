@@ -30,12 +30,19 @@ class ManualMode {
   toggleManualMode(enable) {
     this.isManualMode = enable;
     
+    const handCursor = document.getElementById('hand-cursor');
+    const handControls = document.getElementById('hand-controls');
+    
     if (enable) {
       document.body.classList.add('manual-mode');
+      if (handCursor) handCursor.style.display = 'none';
+      if (handControls) handControls.style.display = 'none';
       this.startManualEffects();
       this.updatePlanetSpeeds(true);
     } else {
       document.body.classList.remove('manual-mode');
+      if (handCursor) handCursor.style.display = 'flex';
+      if (handControls) handControls.style.display = 'flex';
       this.stopManualEffects();
       this.updatePlanetSpeeds(false);
 

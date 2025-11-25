@@ -22,7 +22,7 @@ let sunBright = 1.0; // 0–1
 let planets = [];
 const NUM_PLANETS = 10;
 let selectedPlanet = null;
-// let hoveredPlanet = null;
+let hoveredPlanet = null;
 let isZoomedIn = false;
 let isPaused = false;
 
