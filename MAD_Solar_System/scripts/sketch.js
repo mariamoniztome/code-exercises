@@ -44,6 +44,15 @@ function autoAdjustStars() {
     stars.splice(0, 20);
   }
 
+  // Always ensure we have at least minStars
+  while (stars.length < STAR_MIN) {
+    stars.push({
+      x: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+      y: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+      z: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
+    });
+  }
+
   if (fps > TARGET_FPS * 0.95 && stars.length < STAR_MAX) {
     for (let i = 0; i < 30; i++) {
       stars.push({
@@ -206,14 +215,15 @@ function drawStars() {
   push();
   noStroke();
 
-  // Estrelas brilham mais à noite
-  const starBrightness = map(1 - sunProgress, 0, 1, 40, 255);
+  // Increased star brightness and made it less dependent on sunProgress
+  const starBrightness = map(1 - sunProgress, 0, 1, 80, 255, true);
   fill(starBrightness);
 
+  // Make stars slightly bigger and more detailed
   for (let s of stars) {
     push();
     translate(s.x, s.y, s.z);
-    sphere(1.5, 6, 4);
+    sphere(3, 8, 6);  // Increased size and detail
     pop();
   }
 
