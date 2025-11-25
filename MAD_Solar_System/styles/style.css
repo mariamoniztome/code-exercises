@@ -18,6 +18,10 @@ body {
   cursor: none;
 }
 
+/* Hide ML5 loading indicator */
+#ml5-loading-msg {
+  display: none !important;
+}
 
 #custom-cursor {
     position: fixed;
@@ -39,21 +43,15 @@ body {
     bottom: 20px;
     right: 20px;
     display: flex;
-    flex-direction: column;   
-    align-items: flex-end;   
+    flex-direction: column;
+    align-items: center;
     pointer-events: none;
     z-index: 10000;
-    padding: 10px 14px;
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(8px);
-    border-radius: 12px;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 400;
+    padding: 0;
+    background: transparent;
     user-select: none;
-    animation: fadeIn 0.5s ease-out;
+    transform-origin: bottom right;
 }
-
 
 .hand-cursor img {
     width: 48px;
