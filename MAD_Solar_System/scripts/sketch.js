@@ -239,22 +239,35 @@ function draw() {
   updateSunCycle();
   background(5, 5, 15);
 
-  // sunHue vai de 0 a 360 controlado pela mão
-  let rgb = hslToRgb(sunHue, 0.7, 0.5); // saturação 100%, luz 50%
-  solarColor = rgb; // atualiza cor global do sol
-
-  let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo
-
-  let lr = solarColor.r * intensity;
-  let lg = solarColor.g * intensity;
-  let lb = solarColor.b * intensity;
-
-  // Luz ambiente muito suave
-  ambientLight(10);
-  // Luz direcional (sol como um feixe a partir do topo-direita)
-  directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
-  // Luz pontual intensa (o brilho do sol propriamente dito)
-  pointLight(lr * 2, lg * 2, lb * 2, 0, 0, 0);
+  // Update sun color - use party mode colors if active
+  if (window.partyMode && window.partyMode.isPartyMode) {
+    // In party mode, solarColor is updated by the party mode effect
+    // Use the partyLights for the light sources
+    const lr = window.partyLights ? window.partyLights.r : 255;
+    const lg = window.partyLights ? window.partyLights.g : 255;
+    const lb = window.partyLights ? window.partyLights.b : 255;
+    
+    // More intense and colorful lights in party mode
+    ambientLight(30, 30, 50); // Slightly blue ambient in party mode
+    directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
+    pointLight(lr * 1.5, lg * 1.5, lb * 1.5, 0, 0, 0);
+  } else {
+    // Normal mode - controlled by hand position
+    let rgb = hslToRgb(sunHue, 0.7, 0.5); // saturação 100%, luz 50%
+    solarColor = rgb; // atualiza cor global do sol
+    
+    let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo
+    let lr = solarColor.r * intensity;
+    let lg = solarColor.g * intensity;
+    let lb = solarColor.b * intensity;
+    
+    // Luz ambiente muito suave
+    ambientLight(10);
+    // Luz direcional (sol como um feixe a partir do topo-direita)
+    directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
+    // Luz pontual intensa (o brilho do sol propriamente dito)
+    pointLight(lr * 2, lg * 2, lb * 2, 0, 0, 0);
+  }
 
   // Som dinâmico
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
@@ -298,31 +311,69 @@ function draw() {
     noStroke();
 
     let base = solarColor;
+    
+    // In party mode, use more vibrant colors and effects
+    if (window.partyMode && window.partyMode.isPartyMode) {
+      // More intense and colorful sun in party mode
+      const intensity = 1.5 + 0.5 * sin(frameCount * 0.05); // Pulsing effect
+      
+      // CAMADA 1 — núcleo super brilhante com cores vibrantes
+      emissiveMaterial(base.r * 5 * intensity, base.g * 5 * intensity, base.b * 5 * intensity);
+      sphere(SUN_RADIUS, 64, 48);
 
-    // CAMADA 1 — núcleo super brilhante
-    emissiveMaterial(base.r * 4, base.g * 4, base.b * 4);
-    sphere(SUN_RADIUS, 64, 48);
+      // CAMADA 2 — halo interno com mudança de cor
+      push();
+      const hue = (frameCount * 0.5) % 360;
+      const rgb = hslToRgb(hue, 1, 0.7);
+      emissiveMaterial(rgb.r * 3, rgb.g * 3, rgb.b * 3);
+      scale(1.3);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
 
-    // CAMADA 2 — halo interno
-    push();
-    emissiveMaterial(base.r * 0.8, base.g * 0.8, base.b * 0.8);
-    scale(1.3);
-    sphere(SUN_RADIUS, 64, 48);
-    pop();
+      // CAMADA 3 — halo médio com outra cor
+      push();
+      const hue2 = (frameCount * 0.3 + 120) % 360;
+      const rgb2 = hslToRgb(hue2, 1, 0.6);
+      emissiveMaterial(rgb2.r * 2, rgb2.g * 2, rgb2.b * 2);
+      scale(1.6);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
 
-    // CAMADA 3 — halo externo soft
-    push();
-    emissiveMaterial(base.r * 0.4, base.g * 0.4, base.b * 0.4);
-    scale(1.6);
-    sphere(SUN_RADIUS, 64, 48);
-    pop();
+      // CAMADA 4 — bloom externo com terceira cor
+      push();
+      const hue3 = (frameCount * 0.2 + 240) % 360;
+      const rgb3 = hslToRgb(hue3, 1, 0.5);
+      emissiveMaterial(rgb3.r, rgb3.g, rgb3.b);
+      scale(2.0);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
+    } else {
+      // Normal sun rendering
+      // CAMADA 1 — núcleo super brilhante
+      emissiveMaterial(base.r * 4, base.g * 4, base.b * 4);
+      sphere(SUN_RADIUS, 64, 48);
 
-    // CAMADA 4 — bloom falso muito suave
-    push();
-    emissiveMaterial(base.r * 0.25, base.g * 0.25, base.b * 0.25);
-    scale(2.0);
-    sphere(SUN_RADIUS, 64, 48);
-    pop();
+      // CAMADA 2 — halo interno
+      push();
+      emissiveMaterial(base.r * 0.8, base.g * 0.8, base.b * 0.8);
+      scale(1.3);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
+
+      // CAMADA 3 — halo externo soft
+      push();
+      emissiveMaterial(base.r * 0.4, base.g * 0.4, base.b * 0.4);
+      scale(1.6);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
+
+      // CAMADA 4 — bloom falso muito suave
+      push();
+      emissiveMaterial(base.r * 0.25, base.g * 0.25, base.b * 0.25);
+      scale(2.0);
+      sphere(SUN_RADIUS, 64, 48);
+      pop();
+    }
 
     pop();
   }

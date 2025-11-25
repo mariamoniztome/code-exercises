@@ -36,6 +36,9 @@
       <button id="help-toggle" class="control-btn" title="Atalhos">
         <span class="icon">?</span>
       </button>
+       <button id="party-toggle" class="control-btn" title="Party Mode">
+        <i data-lucide="party-popper" class="icon"></i>
+      </button>
     </div>
   </header>
 
@@ -73,6 +76,17 @@
     <span>Move a mão para interagir</span>
   </div>
 
+  <!-- Party Mode Modal -->
+  <div id="party-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Wanna party?</h2>
+      <div class="modal-buttons">
+        <button id="party-yes" class="party-btn">Yes! 🎉</button>
+        <button id="party-no" class="party-btn">No thanks</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="scripts/data/yearData.js"></script>
   <script src="scripts/classes/Planet.js"></script>
@@ -80,9 +94,10 @@
   <script src="scripts/sketch.js"></script>
   <script src="scripts/ui/ui.js"></script>
   <script src="scripts/systems/textures.js"></script>
+  <script src="scripts/ui/partyMode.js"></script>
 
-    <script>
-      lucide.createIcons();
-    </script>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>

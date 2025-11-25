@@ -334,3 +334,119 @@ kbd {
 .shortcuts-panel:not(.hidden) {
   animation: fadeInScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Party Mode Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: #1a1a2e;
+  padding: 2rem;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(20px);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.modal.visible .modal-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modal h2 {
+  margin-bottom: 1.5rem;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.party-btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  flex: 1;
+  max-width: 150px;
+  font-family: inherit;
+}
+
+.party-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#party-yes {
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+}
+
+#party-no {
+  background: #4a4e69;
+}
+
+/* Party mode effects */
+body.party-mode .sun {
+  animation: partyGlow 2s infinite alternate;
+}
+
+@keyframes partyGlow {
+  0% { box-shadow: 0 0 100px 40px rgba(255, 100, 100, 0.8); }
+  25% { box-shadow: 0 0 100px 40px rgba(100, 255, 100, 0.8); }
+  50% { box-shadow: 0 0 100px 40px rgba(100, 100, 255, 0.8); }
+  75% { box-shadow: 0 0 100px 40px rgba(255, 255, 100, 0.8); }
+  100% { box-shadow: 0 0 100px 40px rgba(255, 100, 255, 0.8); }
+}
+
+.party-mode .planet {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.party-mode .control-btn {
+  animation: colorPulse 3s infinite alternate;
+}
+
+@keyframes colorPulse {
+  0% { background: rgba(255, 100, 100, 0.2); }
+  33% { background: rgba(100, 255, 100, 0.2); }
+  66% { background: rgba(100, 100, 255, 0.2); }
+  100% { background: rgba(255, 100, 255, 0.2); }
+}
