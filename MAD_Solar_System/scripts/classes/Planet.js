@@ -174,103 +174,15 @@ pop();
     pop();
   }
 
-  drawPlanetShape() {
-    const s = this.size;
+drawPlanetShape() {
+  const s = this.size;
 
-    switch (this.index) {
-      case 0:
-        push();
-        rotateX(sin(this.pulsePhase) * 0.3);
-        box(s);
-        pop();
-        break;
+  push();
+  noStroke();
+  box(s);
+  pop();
+}
 
-      case 1:
-        sphere((s / 2) * (1 + sin(this.pulsePhase * 2) * 0.1));
-        break;
-
-      case 2:
-        push();
-        cone(s / 2, s);
-        rotateX(PI);
-        cone(s / 2, s);
-        pop();
-        break;
-
-      case 3:
-        for (let i = 0; i < 3; i++) {
-          push();
-          translate(0, (i - 1) * s * 0.3, 0);
-          rotateY((i * PI) / 3);
-          cylinder(s / 2 - i * 5, s / 3);
-          pop();
-        }
-        break;
-
-      case 4:
-        torus(s / 2, s / 5);
-        push();
-        rotateX(PI / 2);
-        torus(s / 2.2, s / 6);
-        pop();
-        break;
-
-      case 5:
-        push();
-        for (let i = 0; i < 4; i++) {
-          rotateY(PI / 2);
-          cone(s * 0.7, s / 3);
-        }
-        pop();
-        break;
-
-      case 6:
-        for (let i = 0; i < 8; i++) {
-          push();
-          translate(0, (i - 4) * (s / 8), 0);
-          rotateY(i * PI / 4 + this.pulsePhase);
-          cone(s / 3 - i * 2, s / 4);
-          pop();
-        }
-        break;
-
-      case 7:
-        sphere(s / 3);
-        for (let i = 0; i < 6; i++) {
-          push();
-          translate(cos((TWO_PI / 6) * i) * (s / 2), 0, sin((TWO_PI / 6) * i) * (s / 2));
-          sphere(s / 5);
-          pop();
-        }
-        break;
-
-      case 8:
-        for (let i = 0; i < 12; i++) {
-          push();
-          let a = (i / 12) * TWO_PI * 3;
-          translate(cos(a) * (s / 4), (i / 12 - 0.5) * s * 1.5, sin(a) * (s / 4));
-          sphere(s / 8);
-          pop();
-        }
-        cylinder(s / 6, s * 1.5);
-        break;
-
-      case 9:
-        torus(s / 2.5, s / 8);
-        push();
-        rotateX(PI / 3);
-        torus(s / 3, s / 10);
-        pop();
-        push();
-        rotateY(PI / 3);
-        torus(s / 3.5, s / 12);
-        pop();
-        break;
-
-      default:
-        box(s);
-    }
-  }
 
   drawShapeOutline(scale) {
     const s = this.size * scale;

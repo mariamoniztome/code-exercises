@@ -34,7 +34,8 @@ let targetX = 0,
   targetY = -800,
   targetZ = 2000;
 
-
+// Texturas procedurais
+let textureIndexToUpdate = 0;
 // ---------------------- FUNÇÕES GLOBAIS ----------------------
 function autoAdjustStars() {
   const fps = frameRate();
@@ -221,6 +222,9 @@ function drawStars() {
 
 // ---------------------- MAIN DRAW ----------------------
 function draw() {
+  updateProceduralTextures(textureIndexToUpdate);
+  textureIndexToUpdate = (textureIndexToUpdate + 1) % 10;
+
   // Atualiza ciclo solar pela mão
   updateSunCycle();
   background(5, 5, 15);
