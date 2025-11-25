@@ -239,16 +239,16 @@ function draw() {
   updateSunCycle();
   background(5, 5, 15);
 
-  // Update sun color - use party mode colors if active
-  if (window.partyMode && window.partyMode.isPartyMode) {
-    // In party mode, solarColor is updated by the party mode effect
-    // Use the partyLights for the light sources
-    const lr = window.partyLights ? window.partyLights.r : 255;
-    const lg = window.partyLights ? window.partyLights.g : 255;
-    const lb = window.partyLights ? window.partyLights.b : 255;
+  // Update sun color - use manual mode colors if active
+  if (window.manualMode && window.manualMode.isManualMode) {
+    // In manual mode, solarColor is updated by the manual mode effect
+    // Use the manualLights for the light sources
+    const lr = window.manualLights ? window.manualLights.r : 255;
+    const lg = window.manualLights ? window.manualLights.g : 255;
+    const lb = window.manualLights ? window.manualLights.b : 255;
     
-    // More intense and colorful lights in party mode
-    ambientLight(30, 30, 50); // Slightly blue ambient in party mode
+    // More intense and colorful lights in manual mode
+    ambientLight(30, 30, 50); // Slightly blue ambient in manual mode
     directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
     pointLight(lr * 1.5, lg * 1.5, lb * 1.5, 0, 0, 0);
   } else {
@@ -312,9 +312,9 @@ function draw() {
 
     let base = solarColor;
     
-    // In party mode, use more vibrant colors and effects
-    if (window.partyMode && window.partyMode.isPartyMode) {
-      // More intense and colorful sun in party mode
+    // In manual mode, use more vibrant colors and effects
+    if (window.manualMode && window.manualMode.isManualMode) {
+      // More intense and colorful sun in manual mode
       const intensity = 1.5 + 0.5 * sin(frameCount * 0.05); // Pulsing effect
       
       // CAMADA 1 — núcleo super brilhante com cores vibrantes

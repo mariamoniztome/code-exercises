@@ -1,7 +1,7 @@
-class PartyMode {
+class ManualMode {
   constructor() {
-    this.isPartyMode = false;
-    this.partyInterval = null;
+    this.isManualMode = false;
+    this.manualInterval = null;
     this.sunHue = 0;
     this.originalSunColor = { r: 251, g: 217, b: 70 };
 
@@ -10,33 +10,33 @@ class PartyMode {
   }
 
   initElements() {
-    this.partyButton = document.getElementById('party-toggle');
+    this.manualButton = document.getElementById('manual-toggle');
   }
 
   addEventListeners() {
-    // Clicar no botão ativa/desativa diretamente o Party Mode
-    this.partyButton.addEventListener('click', () => {
-      this.togglePartyMode(!this.isPartyMode);
+    // Clicar no botão ativa/desativa diretamente o Manual Mode
+    this.manualButton.addEventListener('click', () => {
+      this.toggleManualMode(!this.isManualMode);
     });
 
     // ESC também desliga
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.isPartyMode) {
-        this.togglePartyMode(false);
+      if (e.key === 'Escape' && this.isManualMode) {
+        this.toggleManualMode(false);
       }
     });
   }
 
-  togglePartyMode(enable) {
-    this.isPartyMode = enable;
+  toggleManualMode(enable) {
+    this.isManualMode = enable;
     
     if (enable) {
-      document.body.classList.add('party-mode');
-      this.startPartyEffects();
+      document.body.classList.add('manual-mode');
+      this.startManualEffects();
       this.updatePlanetSpeeds(true);
     } else {
-      document.body.classList.remove('party-mode');
-      this.stopPartyEffects();
+      document.body.classList.remove('manual-mode');
+      this.stopManualEffects();
       this.updatePlanetSpeeds(false);
 
       if (window.solarColor) {
@@ -45,8 +45,8 @@ class PartyMode {
     }
   }
 
-  startPartyEffects() {
-    this.partyInterval = setInterval(() => {
+  startManualEffects() {
+    this.manualInterval = setInterval(() => {
       this.sunHue = (this.sunHue + 9) % 360;
       const color = this.hslToRgb(this.sunHue / 360, 1, 0.6);
 
@@ -58,8 +58,8 @@ class PartyMode {
         };
       }
 
-      if (window.partyLights) {
-        window.partyLights = {
+      if (window.manualLights) {
+        window.manualLights = {
           r: color.r * 3.5 * 255,
           g: color.g * 3.5 * 255,
           b: color.b * 3.5 * 255
@@ -81,10 +81,10 @@ class PartyMode {
     });
   }
 
-  stopPartyEffects() {
-    if (this.partyInterval) {
-      clearInterval(this.partyInterval);
-      this.partyInterval = null;
+  stopManualEffects() {
+    if (this.manualInterval) {
+      clearInterval(this.manualInterval);
+      this.manualInterval = null;
     }
   }
 
@@ -116,5 +116,5 @@ class PartyMode {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  window.partyMode = new PartyMode();
+  window.manualMode = new ManualMode();
 });

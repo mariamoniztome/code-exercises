@@ -426,7 +426,7 @@ kbd {
   animation: fadeInScale 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Party Mode Styles */
+/* Manual Mode Styles */
 .modal {
   position: fixed;
   top: 0;
@@ -482,7 +482,7 @@ kbd {
   margin-top: 1.5rem;
 }
 
-.party-btn {
+.manual-btn {
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 8px;
@@ -496,25 +496,25 @@ kbd {
   font-family: inherit;
 }
 
-.party-btn:hover {
+.manual-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-#party-yes {
+#manual-yes {
   background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
 }
 
-#party-no {
+#manual-no {
   background: #4a4e69;
 }
 
-/* Party mode effects */
-body.party-mode .sun {
-  animation: partyGlow 2s infinite alternate;
+/* Manual mode effects */
+body.manual-mode .sun {
+  animation: manualGlow 2s infinite alternate;
 }
 
-@keyframes partyGlow {
+@keyframes manualGlow {
   0% { box-shadow: 0 0 100px 40px rgba(255, 100, 100, 0.8); }
   25% { box-shadow: 0 0 100px 40px rgba(100, 255, 100, 0.8); }
   50% { box-shadow: 0 0 100px 40px rgba(100, 100, 255, 0.8); }
@@ -522,7 +522,7 @@ body.party-mode .sun {
   100% { box-shadow: 0 0 100px 40px rgba(255, 100, 255, 0.8); }
 }
 
-.party-mode .planet {
+.manual-mode .planet {
   animation: float 6s ease-in-out infinite;
 }
 
@@ -531,7 +531,7 @@ body.party-mode .sun {
   50% { transform: translateY(-10px); }
 }
 
-.party-mode .control-btn {
+.manual-mode .control-btn {
   animation: colorPulse 3s infinite alternate;
 }
 
