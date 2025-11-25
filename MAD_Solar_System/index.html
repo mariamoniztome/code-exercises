@@ -22,6 +22,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="styles/style.css">
+  <link rel="stylesheet" href="styles/party.css">
 </head>
 
 <body>
@@ -35,6 +36,9 @@
 
       <button id="help-toggle" class="control-btn" title="Atalhos">
         <span class="icon">?</span>
+      </button>
+      <button id="party-toggle" class="control-btn" title="Alternar Modo de Celebração Cósmica">
+        <span class="icon">🎉</span>
       </button>
     </div>
   </header>
@@ -73,16 +77,37 @@
     <span>Move a mão para interagir</span>
   </div>
 
+  <!-- Party Modal -->
+  <div id="party-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🎉 10 Anos de Celebrações Cósmicas! 🎉</h2>
+      <p>Junte-se a nós para celebrar uma década de conquistas estelares e maravilhas cósmicas! Pronto para iluminar o universo conosco?</p>
+      <div class="modal-buttons">
+        <button id="party-yes" class="party-btn">Sim, Vamos Comemorar! 🎊</button>
+        <button id="party-no" class="party-btn">Manter Tranquilo 🌠</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="scripts/data/yearData.js"></script>
   <script src="scripts/classes/Planet.js"></script>
   <script src="scripts/systems/ml5.js"></script>
   <script src="scripts/sketch.js"></script>
+  <script>
+    // Initialize party mode UI after p5.js is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // This will be called after p5.js is loaded
+      if (typeof setupPartyUI === 'function') {
+        setupPartyUI();
+      }
+    });
+  </script>
   <script src="scripts/ui/ui.js"></script>
   <script src="scripts/systems/textures.js"></script>
 
-    <script>
-      lucide.createIcons();
-    </script>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>
