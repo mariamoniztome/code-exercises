@@ -100,13 +100,38 @@ function getHandY() {
 }
 
 function updateSunCycle() {
-  const x = getHandX();
-  const y = getHandY();
-  if (x === null || y === null) return;
-
-  // HUE controla a cor (mover horizontal)
-  sunHue = map(x, 0, 640, 0, 360);
-
-  // brilho controla intensidade (mover vertical)
-  sunBright = map(y, 480, 0, 0.3, 2.5);
+  const handX = getHandX();
+  const handY = getHandY();
+  
+  if (handY !== null) {
+    // Control brightness with vertical hand position (Y-axis)
+    // Higher hand position = brighter sun
+    sunBright = map(handY, 0, height, 0.2, 1.5, true);
+    
+    // Update sun brightness in the UI if the element exists
+    const brightnessDisplay = document.getElementById('brightness-display');
+    if (brightnessDisplay) {
+      brightnessDisplay.textContent = `Brightness: ${sunBright.toFixed(2)}`;
+    }
+  }
+  
+  if (handX !== null) {
+    // Control hue with horizontal hand position (X-axis)
+    // Left to right = 0 to 360 degrees
+    sunHue = map(handX, 0, width, 0, 360, true);
+    
+    // Update sun color in the UI if the element exists
+    const hueDisplay = document.getElementById('hue-display');
+    if (hueDisplay) {
+      hueDisplay.textContent = `Hue: ${Math.round(sunHue)}°`;
+      hueDisplay.style.color = `hsl(${sunHue}, 100%, 50%)`;
+    }
+  }
+  
+  // Convert HSL to RGB for the sun color
+  const rgb = hslToRgb(sunHue / 360, 0.9, 0.5);
+  solarColor = { r: rgb.r, g: rgb.g, b: rgb.b };
+  
+  // Update sun progress based on brightness for other effects
+  sunProgress = map(sunBright, 0.2, 1.5, 0, 1, true);
 }

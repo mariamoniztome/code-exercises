@@ -18,6 +18,47 @@ body {
   cursor: none;
 }
 
+/* Hand Controls */
+.hand-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.control-display {
+  color: white;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-display::before {
+  content: '🎨';
+  font-size: 16px;
+}
+
+.control-display#brightness-display::before {
+  content: '💡';
+}
+
 /* Hide ML5 loading indicator */
 #ml5-loading-msg {
   display: none !important;
