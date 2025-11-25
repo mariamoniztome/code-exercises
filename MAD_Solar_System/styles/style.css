@@ -11,7 +11,8 @@ body {
   height: 100%;
   background: #000000;
   color: rgba(255, 255, 255, 0.95);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -27,48 +28,49 @@ body {
   transform: translateX(-50%);
   display: flex;
   gap: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+
+  padding: 10px;
   border-radius: 30px;
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
   z-index: 1000;
   pointer-events: none;
   opacity: 0.9;
   transition: opacity 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12),
+    0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .control-display {
   color: white;
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 5px;
   padding: 5px 12px;
-  background: rgba(0, 0, 0, 0.4);
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.control-display#brightness-display::before {
-  content: '💡';
-  font-size: 16px;
 }
 
 #custom-cursor {
   position: fixed;
   width: 48px;
   height: 48px;
-  pointer-events: none; 
+  pointer-events: none;
   transform: translate(-50%, -50%);
   animation: spin 8s linear infinite;
   z-index: 10001;
 }
 
 @keyframes spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .hand-cursor {
@@ -117,7 +119,7 @@ body {
 }
 
 .speech-bubble::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -8px;
   right: 20px;
@@ -160,7 +162,7 @@ body {
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12),
-              0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .control-btn:hover {
@@ -168,7 +170,7 @@ body {
   border-color: rgba(255, 255, 255, 0.24);
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16),
-              0 0 1px rgba(255, 255, 255, 0.2) inset;
+    0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
 .control-btn:active {
@@ -189,7 +191,7 @@ body {
   max-width: 450px;
   pointer-events: none;
   transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .planet-info.hidden {
@@ -206,7 +208,7 @@ body {
   border-radius: 16px;
   padding: 20px 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
-              0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .planet-info h1 {
@@ -242,7 +244,7 @@ body {
   color: rgba(255, 255, 255, 0.95);
   z-index: 800;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
-              0 0 1px rgba(255, 255, 255, 0.1) inset;
+    0 0 1px rgba(255, 255, 255, 0.1) inset;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
@@ -318,12 +320,12 @@ kbd {
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   font-size: 12px;
-  font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+  font-family: "SF Mono", "Monaco", "Courier New", monospace;
   font-weight: 500;
   text-align: center;
   color: rgba(255, 255, 255, 0.85);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12),
-              0 0 0 0.5px rgba(255, 255, 255, 0.05) inset;
+    0 0 0 0.5px rgba(255, 255, 255, 0.05) inset;
   letter-spacing: 0.02em;
 }
 
@@ -369,5 +371,4 @@ kbd {
   .info-content {
     padding: 16px 20px;
   }
-  100% { background: rgba(255, 100, 255, 0.2); }
 }
