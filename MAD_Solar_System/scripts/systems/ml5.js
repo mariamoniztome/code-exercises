@@ -8,15 +8,42 @@ let sunProgress = 0.5;
 // Sound Classifier
 function setupSoundClassifier() {
   if (typeof ml5 === "undefined") {
-    console.warn("ml5 não carregado");
+    console.warn("ml5.js not loaded");
     return;
   }
 
-  soundClassifier = ml5.soundClassifier(
-    "SpeechCommands18w",
-    { probabilityThreshold: 0.85 },
-    soundModelReady
-  );
+  // Make sure we have an audio context
+  if (!audioContext) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContext();
+  }
+
+  // Ensure the audio context is running
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      console.log('AudioContext resumed for microphone');
+      initializeSoundClassifier();
+    }).catch(err => {
+      console.error('Error resuming AudioContext for microphone:', err);
+    });
+  } else {
+    initializeSoundClassifier();
+  }
+}
+
+function initializeSoundClassifier() {
+  try {
+    soundClassifier = ml5.soundClassifier(
+      "SpeechCommands18w",
+      { 
+        probabilityThreshold: 0.85,
+        audioContext: audioContext // Use the same audio context
+      },
+      soundModelReady
+    );
+  } catch (error) {
+    console.error('Error initializing sound classifier:', error);
+  }
 }
 
 function soundModelReady() {
@@ -56,7 +83,7 @@ function gotPoses(results) {
 }
 
 function setupPoseNet() {
-  poseNet = ml5.poseNet(video, poseModelReady);
+  poseNet = ml5.poseNet(video);
   poseNet.on("pose", gotPoses);
 }
 

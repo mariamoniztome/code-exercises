@@ -3,6 +3,9 @@ let spaceSound;
 let volume = 0.5;
 let soundEnabled = true;
 let soundButton;
+let audioContext;
+let audioInitialized = false;
+
 // Stars
 let stars = [];
 let TARGET_FPS = 60;
@@ -94,7 +97,41 @@ function unselectPlanet() {
 
 // Preload assets
 function preload() {
-  spaceSound = loadSound("assets/sounds/space.mp3");
+  // Initialize audio context on user interaction
+  document.addEventListener('click', initAudioContext, { once: true });
+  spaceSound = loadSound("assets/sounds/space.mp3", () => {
+    if (soundEnabled && audioInitialized) {
+      spaceSound.setVolume(volume);
+      spaceSound.loop();
+    }
+  });
+}
+
+// Initialize audio context on user interaction
+function initAudioContext() {
+  if (audioInitialized) return;
+  
+  // Create audio context
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  audioContext = new AudioContext();
+  
+  // Resume audio context if it was suspended
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      console.log('AudioContext resumed successfully');
+      audioInitialized = true;
+      if (spaceSound && soundEnabled) {
+        spaceSound.setVolume(volume);
+        spaceSound.loop();
+      }
+      setupSoundClassifier(); // Initialize sound classifier after audio context is ready
+    }).catch(error => {
+      console.error('Error resuming AudioContext:', error);
+    });
+  } else {
+    audioInitialized = true;
+    setupSoundClassifier();
+  }
 }
 
 // Setup the sketch
