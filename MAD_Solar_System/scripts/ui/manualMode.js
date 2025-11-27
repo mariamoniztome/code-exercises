@@ -19,6 +19,13 @@ class ManualMode {
       this.toggleManualMode(!this.isManualMode);
     });
 
+    // 'M' key for manual mode
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'm') {
+        this.toggleManualMode(!this.isManualMode);
+      }
+    });
+
     // ESC also disables manual mode
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isManualMode) {
