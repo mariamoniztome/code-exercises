@@ -110,3 +110,9 @@ Este projeto está licenciado sob a Licença MIT. Consulte o ficheiro LICENSE pa
 ---
 Documentação criada em 27 de novembro de 2024
 © 2024 MAD Solar System Project
+
+
+
+-- Alterar a bubble to speech no css pq está mt longe
+-- Verificar o icon de som e como o som está a funcionar
+-- Fazer o relatório
