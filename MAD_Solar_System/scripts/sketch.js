@@ -1,42 +1,40 @@
-// Som
+// Sound
 let spaceSound;
 let volume = 0.5;
 let soundEnabled = true;
 let soundButton;
-
-// Estrelas
+// Stars
 let stars = [];
 let TARGET_FPS = 60;
 const STAR_MIN = 500;
 const STAR_MAX = 5000;
 const NUM_STARS = 5000;
 const STAR_FIELD_SIZE = 3000;
-
-// Sol
+// Sun
 const SUN_RADIUS = 80;
 let solarColor = { r: 251, g: 217, b: 70 };
 let sunHue = 30; // 0–360
 let sunBright = 1.0; // 0–1
-
-// Planetas
+// Planets
 let planets = [];
 const NUM_PLANETS = 10;
 let selectedPlanet = null;
 let hoveredPlanet = null;
 let isZoomedIn = false;
 let isPaused = false;
-
-// Câmara
+// Camera
 let camX = 0,
   camY = -800,
   camZ = 2000;
 let targetX = 0,
   targetY = -800,
   targetZ = 2000;
-
-// Texturas procedurais
+// Procedural textures
 let textureIndexToUpdate = 0;
-// ---------------------- FUNÇÕES GLOBAIS ----------------------
+
+// Global functions
+
+// Auto adjust star count based on frame rate
 function autoAdjustStars() {
   const fps = frameRate();
 
@@ -64,6 +62,7 @@ function autoAdjustStars() {
   }
 }
 
+// Select a planet by its index
 function selectPlanetByIndex(idx) {
   if (idx < 0 || idx >= planets.length) return;
   const p = planets[idx];
@@ -79,9 +78,10 @@ function selectPlanetByIndex(idx) {
   targetY = 0;
   targetZ = pz + p.size * 1.5 + 150;
   showPlanetInfo(p);
-  console.log(`✨ ${p.yearData.year} selecionado!`);
+  console.log(`${p.yearData.year} selected.`);
 }
 
+// Unselect the current planet and return to overview
 function unselectPlanet() {
   selectedPlanet = null;
   isZoomedIn = false;
@@ -89,26 +89,27 @@ function unselectPlanet() {
   targetY = -800;
   targetZ = 2000;
   hidePlanetInfo();
-  console.log("Retorno à visão geral do sistema solar.");
+  console.log("Return to solar system overview.");
 }
 
-// ---------------------- PRELOAD & SETUP ----------------------
+// Preload assets
 function preload() {
   spaceSound = loadSound("assets/sounds/space.mp3");
 }
 
+// Setup the sketch
 function setup() {
   frameRate(60);
   createCanvas(windowWidth, windowHeight, WEBGL);
   camera(0, -800, 2000);
   createProceduralTextures();
 
-  // Vídeo para PoseNet 
+  // Video for PoseNet 
   video = createCapture(VIDEO);
   video.size(640, 480);
   video.hide();
 
-  // Estrelas
+  // Stars
   for (let i = 0; i < NUM_STARS; i++) {
     stars.push({
       x: random(-STAR_FIELD_SIZE, STAR_FIELD_SIZE),
@@ -117,7 +118,7 @@ function setup() {
     });
   }
 
-  // Planetas
+  // Planets
   let sizes = [50, 55, 50, 70, 55, 60, 52, 75, 58, 90];
   for (let i = 0; i < NUM_PLANETS; i++) {
     planets.push(
@@ -125,7 +126,7 @@ function setup() {
     );
   }
 
-  // Som
+  // Sound
   setTimeout(() => {
     if (spaceSound && !spaceSound.isPlaying()) {
       spaceSound.loop();
@@ -136,7 +137,7 @@ function setup() {
   soundButton = document.getElementById("sound-toggle");
   if (soundButton) soundButton.addEventListener("click", toggleSound);
 
-  // Atalhos de teclado
+  // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") return;
@@ -179,7 +180,9 @@ function setup() {
   setupSoundClassifier();
 }
 
-// ---------------------- DRAW HELPERS ----------------------
+// Helpers
+
+// Convert HSL to RGB
 function hslToRgb(h, s, l) {
   h /= 360;
   let r, g, b;
@@ -211,6 +214,7 @@ function hslToRgb(h, s, l) {
   };
 }
 
+// Draw stars in the background
 function drawStars() {
   push();
   noStroke();
@@ -223,19 +227,19 @@ function drawStars() {
   for (let s of stars) {
     push();
     translate(s.x, s.y, s.z);
-    sphere(3, 8, 6);  // Increased size and detail
+    sphere(3, 8, 6);
     pop();
   }
 
   pop();
 }
 
-// ---------------------- MAIN DRAW ----------------------
+// Main draw loop
 function draw() {
   updateProceduralTextures(textureIndexToUpdate);
   textureIndexToUpdate = (textureIndexToUpdate + 1) % 10;
 
-  // Atualiza ciclo solar pela mão
+  // Update sun cycle based on hand position
   updateSunCycle();
   background(5, 5, 15);
 
@@ -247,29 +251,28 @@ function draw() {
     const lg = window.manualLights ? window.manualLights.g : 255;
     const lb = window.manualLights ? window.manualLights.b : 255;
     
-    // More intense and colorful lights in manual mode
-    ambientLight(30, 30, 50); // Slightly blue ambient in manual mode
+    ambientLight(30, 30, 50);
     directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
     pointLight(lr * 1.5, lg * 1.5, lb * 1.5, 0, 0, 0);
   } else {
     // Normal mode - controlled by hand position
-    let rgb = hslToRgb(sunHue, 0.7, 0.5); // saturação 100%, luz 50%
-    solarColor = rgb; // atualiza cor global do sol
+    let rgb = hslToRgb(sunHue, 0.7, 0.5); // saturation 70%, lightness 50%
+    solarColor = rgb; // update global sun color
     
-    let intensity = lerp(0.3, 2.5, sunProgress); // sol mais forte quando mão está no topo
+    let intensity = lerp(0.3, 2.5, sunProgress); // sun stronger when hand is at the top
     let lr = solarColor.r * intensity;
     let lg = solarColor.g * intensity;
     let lb = solarColor.b * intensity;
     
-    // Luz ambiente muito suave
+    // Very soft ambient light
     ambientLight(10);
-    // Luz direcional (sol como um feixe a partir do topo-direita)
+    // Directional light (sun as a beam from the top-right)
     directionalLight(lr, lg, lb, 0.5, -0.3, -0.4);
-    // Luz pontual intensa (o brilho do sol propriamente dito)
+    // Intense point light (the sun's actual glow)
     pointLight(lr * 2, lg * 2, lb * 2, 0, 0, 0);
   }
 
-  // Som dinâmico
+  // Dynamic sound
   if (spaceSound && spaceSound.isPlaying() && soundEnabled) {
     if (isZoomedIn) {
       spaceSound.setVolume(0.1);
@@ -301,11 +304,11 @@ function draw() {
     camera(camX, camY, camZ, 0, 0, 0, 0, 1, 0);
   }
 
-  // Estrelas
+  // Stars
   autoAdjustStars();
   drawStars();
 
-  // Sol
+  // Sun
   if (!isZoomedIn) {
     push();
     noStroke();
@@ -317,11 +320,11 @@ function draw() {
       // More intense and colorful sun in manual mode
       const intensity = 1.5 + 0.5 * sin(frameCount * 0.05); // Pulsing effect
       
-      // CAMADA 1 — núcleo super brilhante com cores vibrantes
+      // LAYER 1 — super bright core with vibrant colors
       emissiveMaterial(base.r * 5 * intensity, base.g * 5 * intensity, base.b * 5 * intensity);
       sphere(SUN_RADIUS, 64, 48);
 
-      // CAMADA 2 — halo interno com mudança de cor
+      // LAYER 2 — inner halo with color shift
       push();
       const hue = (frameCount * 0.5) % 360;
       const rgb = hslToRgb(hue, 1, 0.7);
@@ -330,7 +333,7 @@ function draw() {
       sphere(SUN_RADIUS, 64, 48);
       pop();
 
-      // CAMADA 3 — halo médio com outra cor
+      // LAYER 3 — middle halo with another color
       push();
       const hue2 = (frameCount * 0.3 + 120) % 360;
       const rgb2 = hslToRgb(hue2, 1, 0.6);
@@ -339,7 +342,7 @@ function draw() {
       sphere(SUN_RADIUS, 64, 48);
       pop();
 
-      // CAMADA 4 — bloom externo com terceira cor
+      // LAYER 4 — outer bloom with third color
       push();
       const hue3 = (frameCount * 0.2 + 240) % 360;
       const rgb3 = hslToRgb(hue3, 1, 0.5);
@@ -349,25 +352,25 @@ function draw() {
       pop();
     } else {
       // Normal sun rendering
-      // CAMADA 1 — núcleo super brilhante
+      // LAYER 1 — super bright core
       emissiveMaterial(base.r * 4, base.g * 4, base.b * 4);
       sphere(SUN_RADIUS, 64, 48);
 
-      // CAMADA 2 — halo interno
+      // LAYER 2 — inner halo
       push();
       emissiveMaterial(base.r * 0.8, base.g * 0.8, base.b * 0.8);
       scale(1.3);
       sphere(SUN_RADIUS, 64, 48);
       pop();
 
-      // CAMADA 3 — halo externo soft
+      // LAYER 3 — outer soft halo
       push();
       emissiveMaterial(base.r * 0.4, base.g * 0.4, base.b * 0.4);
       scale(1.6);
       sphere(SUN_RADIUS, 64, 48);
       pop();
 
-      // CAMADA 4 — bloom falso muito suave
+      // LAYER 4 — very soft fake bloom
       push();
       emissiveMaterial(base.r * 0.25, base.g * 0.25, base.b * 0.25);
       scale(2.0);
@@ -378,14 +381,14 @@ function draw() {
     pop();
   }
 
-  // Órbitas
+  // Orbits
   if (!isZoomedIn) {
     for (let p of planets) {
       p.drawOrbit();
     }
   }
 
-  // Planetas
+  // Planets
   for (let p of planets) {
     if (!isPaused) p.update();
     if (!isZoomedIn || p === selectedPlanet) {
@@ -394,15 +397,16 @@ function draw() {
   }
 }
 
-// ---------------------- INPUT ----------------------
+// Event handlers
 
+// Mouse pressed
 function mousePressed() {
   if (spaceSound && !spaceSound.isPlaying()) {
     spaceSound.loop();
     spaceSound.setVolume(0.5);
   }
 
-  // Seleção simples por clique (SEM TOOLTIP)
+  // Simple selection by click 
   if (!isZoomedIn && hoveredPlanet) {
     selectedPlanet = hoveredPlanet;
     isZoomedIn = true;
@@ -420,10 +424,13 @@ function mousePressed() {
   }
 }
 
+
+// Window resized 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
+// Mouse wheel for zooming
 function mouseWheel(event) {
   if (!isZoomedIn) {
     targetZ += event.delta * 2;

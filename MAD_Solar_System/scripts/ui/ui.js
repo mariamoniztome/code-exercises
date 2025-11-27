@@ -8,7 +8,7 @@ window.addEventListener("DOMContentLoaded", () => {
     shortcuts.classList.toggle("hidden");
   });
 
-  // Fechar ao clicar fora
+  // Hide shortcuts when clicking outside
   document.addEventListener("click", (e) => {
     if (
       !shortcuts.contains(e.target) &&
@@ -19,7 +19,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Botão de Som
+  // Sound toggle
   const soundBtn = document.getElementById("sound-toggle");
   soundBtn.addEventListener("click", () => {
     if (typeof toggleSound === "function") toggleSound();
@@ -28,9 +28,8 @@ window.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mousemove", (e) => {
     const cursor = document.getElementById("custom-cursor");
     cursor.style.left = `${e.clientX}px`;
-    cursor.style.top  = `${e.clientY}px`;
-});
-
+    cursor.style.top = `${e.clientY}px`;
+  });
 });
 
 function showPlanetInfo(planet) {
@@ -49,7 +48,6 @@ function hidePlanetInfo() {
   const info = document.getElementById("planet-info");
   if (info) info.classList.add("hidden");
 }
-
 
 function toggleSound() {
   soundEnabled = !soundEnabled;

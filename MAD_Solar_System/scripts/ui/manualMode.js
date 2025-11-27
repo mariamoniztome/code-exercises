@@ -14,12 +14,12 @@ class ManualMode {
   }
 
   addEventListeners() {
-    // Clicar no botão ativa/desativa diretamente o Manual Mode
+    // Toggle manual mode on button click
     this.manualButton.addEventListener('click', () => {
       this.toggleManualMode(!this.isManualMode);
     });
 
-    // ESC também desliga
+    // ESC also disables manual mode
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isManualMode) {
         this.toggleManualMode(false);
@@ -27,6 +27,7 @@ class ManualMode {
     });
   }
 
+  // Enable or disable manual mode
   toggleManualMode(enable) {
     this.isManualMode = enable;
     
@@ -52,6 +53,7 @@ class ManualMode {
     }
   }
 
+  // Start manual color cycling effects
   startManualEffects() {
     this.manualInterval = setInterval(() => {
       this.sunHue = (this.sunHue + 9) % 360;
@@ -75,6 +77,7 @@ class ManualMode {
     }, 30);
   }
 
+  // Speed up or reset planet speeds
   updatePlanetSpeeds(faster = true) {
     if (!window.planets) return;
     
@@ -88,6 +91,7 @@ class ManualMode {
     });
   }
 
+  // Stop manual color cycling effects
   stopManualEffects() {
     if (this.manualInterval) {
       clearInterval(this.manualInterval);
@@ -95,6 +99,7 @@ class ManualMode {
     }
   }
 
+  // Convert HSL to RGB
   hslToRgb(h, s, l) {
     let r, g, b;
 

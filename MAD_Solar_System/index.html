@@ -1,102 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAD Solar System</title>
-  <!-- fav.ico -->
-  <link rel="icon" type="image/x-icon" href="assets/img/logo.png">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MAD Solar System</title>
+    <!-- fav.ico -->
+    <link rel="icon" type="image/x-icon" href="assets/img/logo.png" />
 
-  <!-- Custom Cursor -->
-  <img id="custom-cursor" src="assets/img/logo.png">
+    <!-- Custom Cursor -->
+    <img id="custom-cursor" src="assets/img/logo.png" />
 
-  <!-- p5.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <!-- p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
 
-  <!-- ml5.js -->
-  <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+    <!-- ml5.js -->
+    <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
 
-  <!-- Ícones -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="styles/style.css">
-</head>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/style.css" />
+  </head>
 
-<body>
-  <!-- <img id="custom-cursor" src="assets/img/logo.png" alt="Cursor"> -->
-  <!-- Header -->
-  <header class="header">
-    <div class="header-controls">
-      <button id="sound-toggle" class="control-btn" title="Som">
-        <i data-lucide="volume-2" class="icon"></i>
-      </button>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-controls">
+        <button id="sound-toggle" class="control-btn" title="Som">
+          <i data-lucide="volume-2" class="icon"></i>
+        </button>
 
-      <button id="help-toggle" class="control-btn" title="Atalhos">
-        <span class="icon">?</span>
-      </button>
-       <button id="manual-toggle" class="control-btn" title="Manual Mode">
-        <i data-lucide="hand" class="icon"></i>
-      </button>
-    </div>
-  </header>
+        <button id="help-toggle" class="control-btn" title="Atalhos">
+          <span class="icon">?</span>
+        </button>
+        <button id="manual-toggle" class="control-btn" title="Manual Mode">
+          <i data-lucide="hand" class="icon"></i>
+        </button>
+      </div>
+    </header>
 
-  <!-- Painel Info -->
-  <div id="planet-info" class="planet-info hidden">
-    <div class="info-content">
-      <h1 id="planet-title"></h1>
-      <p id="planet-description"></p>
-    </div>
-  </div>
-
-  <!-- Painel de Atalhos -->
-  <div id="shortcuts" class="panel shortcuts-panel hidden">
-    <div class="panel-header">
-      <h3>Atalhos de Teclado</h3>
-      <button class="close-btn" onclick="document.getElementById('shortcuts').classList.add('hidden')">
-        ×
-      </button>
+    <!-- Painel Info -->
+    <div id="planet-info" class="planet-info hidden">
+      <div class="info-content">
+        <h1 id="planet-title"></h1>
+        <p id="planet-description"></p>
+      </div>
     </div>
 
-    <div class="panel-content">
-      <div class="shortcut-item"><kbd>1-0</kbd> <span>Selecionar anos 2017–2026</span></div>
-      <div class="shortcut-item"><kbd>Esc</kbd> <span>Sair do zoom</span></div>
-      <div class="shortcut-item"><kbd>Space</kbd> <span>Pausar animação</span></div>
-      <div class="shortcut-item"><kbd>H</kbd> <span>Mostrar/Ocultar atalhos</span></div>
-      <div class="shortcut-item"><kbd>Mouse</kbd> <span>Hover + Clique</span></div>
-      <div class="shortcut-item"><kbd>Wheel</kbd> <span>Zoom</span></div>
-      <div class="shortcut-item"><kbd>Voice</kbd> <span>Comandos "one"-"nine"</span></div>
+    <!-- Shortcuts Panel -->
+    <div id="shortcuts" class="panel shortcuts-panel hidden">
+      <div class="panel-header">
+        <h3>Atalhos de Teclado</h3>
+        <button
+          class="close-btn"
+          onclick="document.getElementById('shortcuts').classList.add('hidden')"
+        >
+          <i data-lucide="x" class="icon"></i>
+        </button>
+      </div>
+
+      <div class="panel-content">
+        <div class="shortcut-item">
+          <kbd>1-0</kbd> <span>Selecionar anos 2017–2026</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Esc</kbd> <span>Sair do zoom</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Space</kbd> <span>Pausar animação</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>H</kbd> <span>Mostrar/Ocultar atalhos</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Mouse</kbd> <span>Hover + Clique</span>
+        </div>
+        <div class="shortcut-item"><kbd>Wheel</kbd> <span>Zoom</span></div>
+        <div class="shortcut-item">
+          <kbd>Voice</kbd> <span>Comandos "one"-"nine"</span>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Hand cursor with speech bubble -->
-  <div id="hand-cursor" class="hand-cursor">
-    <div class="speech-bubble">
-      <span>Move a mão para interagir</span>
-      <div class="speech-arrow"></div>
+    <!-- Hand cursor with speech bubble -->
+    <div id="hand-cursor" class="hand-cursor">
+      <div class="speech-bubble">
+        <span>Move a mão para interagir</span>
+        <div class="speech-arrow"></div>
+      </div>
+      <img src="assets/img/hand_moving.gif" alt="Mão" />
     </div>
-    <img src="assets/img/hand_moving.gif" alt="Mão">
-  </div>
 
-  <!-- Hand Controls Overlay -->
-  <div id="hand-controls" class="hand-controls">
-    <div class="control-display" id="hue-display">Hue: 30°</div>
-    <div class="control-display" id="brightness-display">Intensidade: 1.0</div>
-  </div>
+    <!-- Hand Controls Overlay -->
+    <div id="hand-controls" class="hand-controls">
+      <div class="control-display" id="hue-display">Hue: 30°</div>
+      <div class="control-display" id="brightness-display">
+        Intensidade: 1.0
+      </div>
+    </div>
 
-  <!-- Scripts -->
-  <script src="scripts/data/yearData.js"></script>
-  <script src="scripts/classes/Planet.js"></script>
-  <script src="scripts/systems/ml5.js"></script>
-  <script src="scripts/sketch.js"></script>
-  <script src="scripts/ui/ui.js"></script>
-  <script src="scripts/systems/textures.js"></script>
-  <script src="scripts/ui/manualMode.js"></script>
-  <script src="scripts/ui/handCursor.js"></script>
+    <!-- Scripts -->
+    <script src="scripts/data/yearData.js"></script>
+    <script src="scripts/classes/Planet.js"></script>
+    <script src="scripts/systems/ml5.js"></script>
+    <script src="scripts/sketch.js"></script>
+    <script src="scripts/ui/ui.js"></script>
+    <script src="scripts/systems/textures.js"></script>
+    <script src="scripts/ui/manualMode.js"></script>
+    <script src="scripts/ui/handCursor.js"></script>
 
-  <script>
-    lucide.createIcons();
-  </script>
-</body>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>

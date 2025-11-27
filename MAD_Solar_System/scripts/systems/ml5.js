@@ -1,3 +1,4 @@
+// ml5.js integration for Sound Classification and PoseNet
 let soundClassifier;
 let poseNet;
 let video;
@@ -11,8 +12,6 @@ function setupSoundClassifier() {
     return;
   }
 
-  console.log("Sound Classifier...");
-
   soundClassifier = ml5.soundClassifier(
     "SpeechCommands18w",
     { probabilityThreshold: 0.85 },
@@ -21,7 +20,6 @@ function setupSoundClassifier() {
 }
 
 function soundModelReady() {
-  console.log("Sound pronto");
   soundClassifier.classify(gotCommand);
 }
 
@@ -33,11 +31,10 @@ function gotCommand(error, results) {
 
   const label = results[0].label;
   const conf = results[0].confidence;
+  // Filter by confidence
   if (conf < 0.85) return;
 
-  console.log(`Comando: ${label}`);
-
-  // Navegação por voz
+  // Map commands to planet selection
   if (label === "zero") selectPlanetByIndex(9);
   else if (label === "one") selectPlanetByIndex(0);
   else if (label === "two") selectPlanetByIndex(1);
@@ -52,38 +49,36 @@ function gotCommand(error, results) {
   else if (label === "go") isPaused = !isPaused;
 }
 
-// 3) PoseNet 
+// PoseNet 
 function gotPoses(results) {
   if (results.length === 0) return;
-  poses = results;   // atualiza a variável global usada no draw()
+  poses = results;   // Update the global variable used in draw()
 }
 
 function setupPoseNet() {
-  console.log("PoseNet...");
   poseNet = ml5.poseNet(video, poseModelReady);
   poseNet.on("pose", gotPoses);
 }
 
-function poseModelReady() {
-  console.log("PoseNet pronto");
-}
-
-// Retorna X normalizado entre 0–640 OU null se nenhuma mão for detetada
+// Get hand X position
 function getHandX() {
   if (poses.length === 0) return null;
 
+  // Consider only the first detected person
   const pose = poses[0].pose;
 
+  // Get wrist positions
   const right = pose.rightWrist;
   const left = pose.leftWrist;
 
-  // Prioridade à mão direita
+  // Prioritize right hand
   if (right.confidence > 0.4) return right.x;
   if (left.confidence > 0.4) return left.x;
 
   return null;
 }
 
+// Get hand Y position
 function getHandY() {
   if (poses.length === 0) return null;
 
@@ -92,7 +87,7 @@ function getHandY() {
   const right = pose.rightWrist;
   const left = pose.leftWrist;
 
-  // prioridade à mão direita
+  // Prioritize right hand
   if (right.confidence > 0.4) return right.y;
   if (left.confidence > 0.4) return left.y;
 

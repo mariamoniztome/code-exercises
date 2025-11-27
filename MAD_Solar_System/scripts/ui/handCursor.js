@@ -4,7 +4,7 @@ class HandCursor {
     
     // Debug: Log if hand element is found
     if (!this.handElement) {
-      console.error('Hand cursor element not found!');
+      console.error('Hand cursor element not found');
       return;
     }
     
@@ -12,17 +12,12 @@ class HandCursor {
     
     // Debug: Log if bubble element is found
     if (!this.bubbleElement) {
-      console.error('Speech bubble element not found!');
-    } else {
-      console.log('Speech bubble element found:', this.bubbleElement);
+      console.error('Speech bubble element not found');
     }
     
     this.visibilityTimeout = null;
     this.hideBubbleTimeout = null;
     this.isVisible = false;
-    
-    // Debug: Log initialization
-    console.log('HandCursor initialized');
     
     this.init();
   }
@@ -47,10 +42,10 @@ class HandCursor {
     this.isVisible = true;
     this.handElement.classList.add('show-bubble', 'pulse');
     
-    // Hide bubble after 2 seconds
+    // Hide bubble after 15 seconds
     this.hideBubbleTimeout = setTimeout(() => {
       this.hideBubble();
-    }, 2000);
+    }, 15000);
   }
 
   hideBubble() {
@@ -65,8 +60,8 @@ class HandCursor {
   }
 
   scheduleNextShow() {
-    // Show bubble after 2 seconds
-    const delay = 10000;
+    // Show bubble after a random delay between 15-30 seconds
+    const delay = 15000 + Math.random() * 15000; // 15-30 seconds
     
     clearTimeout(this.visibilityTimeout);
     this.visibilityTimeout = setTimeout(() => {

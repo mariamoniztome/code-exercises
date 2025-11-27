@@ -1,40 +1,39 @@
 class Planet {
   constructor(orbitRadius, size, speed, yearData, index) {
+    // Parameters
     this.orbitRadius = orbitRadius;
     this.size = size;
     this.speed = speed;
     this.yearData = yearData;
     this.index = index;
-
     this.angle = random(TWO_PI);
     this.rotationX = 0;
     this.rotationY = 0;
     this.rotationZ = 0;
-
-    this.hoverScale = 1.0;
     this.glowIntensity = 0;
     this.satellites = [];
     this.particles = [];
     this.pulsePhase = random(TWO_PI);
-
     this.isPaused = false;
   }
 
   update() {
+    // Pause check
     if (this.isPaused) return;
 
+    // Update position and rotation
     this.angle += this.speed;
-
     this.rotationX += 0.005 + this.index * 0.001;
     this.rotationY += 0.008 + this.index * 0.0005;
     this.rotationZ += 0.003 + this.index * 0.0003;
-
     this.pulsePhase += 0.05;
 
+    // Update speed of satellites and particles
     for (let s of this.satellites) {
       s.angle += s.speed;
     }
 
+    // Update particles
     for (let p of this.particles) {
       if (p.speed) p.angle += p.speed;
       if (p.phase !== undefined) p.phase += 0.05;
@@ -42,6 +41,7 @@ class Planet {
     }
   }
 
+  // Draw the orbit path
   drawOrbit() {
     push();
     noFill();
@@ -59,6 +59,7 @@ class Planet {
     pop();
   }
 
+  // Draw the planet
   display() {
     push();
 
@@ -66,7 +67,6 @@ class Planet {
     let z = sin(this.angle) * this.orbitRadius;
 
     translate(x, 0, z);
-    scale(this.hoverScale);
 
     // Glow outer rings
     if (this.glowIntensity > 0.1) {
@@ -102,7 +102,7 @@ class Planet {
 
     ambientMaterial(255);
 
-    // aplica textura
+    // Apply procedural texture if available
     if (proceduralTextures.length > 0) {
       texture(proceduralTextures[this.index % proceduralTextures.length]);
     }
@@ -127,7 +127,6 @@ class Planet {
 
   drawPlanetShape() {
     const s = this.size;
-
     push();
     noStroke();
     box(s);
