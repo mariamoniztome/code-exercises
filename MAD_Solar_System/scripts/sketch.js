@@ -172,7 +172,6 @@ function setup() {
   }, 500);
 
   soundButton = document.getElementById("sound-toggle");
-  if (soundButton) soundButton.addEventListener("click", toggleSound);
 
   // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
