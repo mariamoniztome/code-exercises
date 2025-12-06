@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  cursor: none;
 }
 
 html,
@@ -30,7 +31,6 @@ body {
   gap: 20px;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(40px) saturate(180%);
-
   padding: 10px;
   border-radius: 30px;
   backdrop-filter: blur(5px);
@@ -100,9 +100,9 @@ body {
 /* Speech bubble */
 .speech-bubble {
   position: absolute;
-  top: -60px;
-  right: 100%;
-  margin-right: 15px;
+  top: -40px;
+  right: 0;
+  margin-right: 10px;
   background: white;
   color: #333;
   padding: 10px 15px;
