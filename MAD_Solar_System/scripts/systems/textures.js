@@ -64,6 +64,27 @@ function updateProceduralTextures(i) {
       {
         let pg = proceduralTextures[2];
         pg.push();
+        pg.background(0, 206, 209);
+        pg.noStroke();
+
+        for (let x = 20; x < TEX_SIZE; x += 40) {
+          for (let y = 20; y < TEX_SIZE; y += 40) {
+            let size = 12 + sin(time * 2 + x * 0.1 + y * 0.1) * 8;
+            let col =
+              (x + y) % 80 < 40 ? color(255, 69, 0) : color(255, 215, 0);
+            pg.fill(col);
+            pg.circle(x, y, size);
+          }
+        }
+
+        pg.pop();
+      } 
+      break;
+    // Pulsating circle grid
+    case 3:
+      {
+        let pg = proceduralTextures[4];
+        pg.push();
         pg.background(138, 43, 226);
         pg.noFill();
         pg.strokeWeight(4);
@@ -82,31 +103,10 @@ function updateProceduralTextures(i) {
         pg.pop();
       }
       break;
-    // Pulsating circle grid
-    case 3:
-      {
-        let pg = proceduralTextures[3];
-        pg.push();
-        pg.background(0, 206, 209);
-        pg.noStroke();
-
-        for (let x = 20; x < TEX_SIZE; x += 40) {
-          for (let y = 20; y < TEX_SIZE; y += 40) {
-            let size = 12 + sin(time * 2 + x * 0.1 + y * 0.1) * 8;
-            let col =
-              (x + y) % 80 < 40 ? color(255, 69, 0) : color(255, 215, 0);
-            pg.fill(col);
-            pg.circle(x, y, size);
-          }
-        }
-
-        pg.pop();
-      }
-      break;
     // Concentric animated lines
     case 4:
       {
-        let pg = proceduralTextures[4];
+        let pg = proceduralTextures[3];
         pg.push();
         pg.background(255, 215, 0);
         pg.strokeWeight(4);
@@ -128,23 +128,21 @@ function updateProceduralTextures(i) {
       {
         let pg = proceduralTextures[5];
         pg.push();
-        pg.background(255, 20, 147);
-        pg.noFill();
-        pg.strokeWeight(5);
+        pg.background(255, 182, 193);
         pg.translate(TEX_SIZE / 2, TEX_SIZE / 2);
-        pg.rotate(time * 0.5);
+        pg.rotate(time * 0.4);
+        pg.noStroke();
 
-        pg.beginShape();
-        for (let a = 0; a < TWO_PI * 6; a += 0.1) {
-          let r = a * 8 + sin(time * 2 + a) * 10;
-          let col =
-            a % (TWO_PI / 3) < TWO_PI / 6
-              ? color(255, 215, 0)
-              : color(0, 206, 209);
-          pg.stroke(col);
-          pg.vertex(cos(a) * r, sin(a) * r);
-        }
-        pg.endShape();
+        let tri = 100;
+
+        pg.fill(147, 112, 219);
+        pg.quad(-tri, 0, 0, -tri * 0.6, tri * 0.3, -tri * 0.4, 0, tri * 0.3);
+
+        pg.fill(216, 191, 216);
+        pg.quad(tri, 0, tri * 0.3, -tri * 0.4, 0, -tri * 0.6, 0, tri * 0.3);
+
+        pg.fill(75, 0, 130);
+        pg.quad(0, tri, 0, tri * 0.3, tri, 0, tri * 0.5, tri * 0.5);
 
         pg.pop();
       }
@@ -203,24 +201,27 @@ function updateProceduralTextures(i) {
       break;
     // Impossible Penrose Triangle
     case 8:
+
       {
         let pg = proceduralTextures[8];
         pg.push();
-        pg.background(255, 182, 193);
+        pg.background(255, 20, 147);
+        pg.noFill();
+        pg.strokeWeight(5);
         pg.translate(TEX_SIZE / 2, TEX_SIZE / 2);
-        pg.rotate(time * 0.4);
-        pg.noStroke();
+        pg.rotate(time * 0.5);
 
-        let tri = 100;
-
-        pg.fill(147, 112, 219);
-        pg.quad(-tri, 0, 0, -tri * 0.6, tri * 0.3, -tri * 0.4, 0, tri * 0.3);
-
-        pg.fill(216, 191, 216);
-        pg.quad(tri, 0, tri * 0.3, -tri * 0.4, 0, -tri * 0.6, 0, tri * 0.3);
-
-        pg.fill(75, 0, 130);
-        pg.quad(0, tri, 0, tri * 0.3, tri, 0, tri * 0.5, tri * 0.5);
+        pg.beginShape();
+        for (let a = 0; a < TWO_PI * 6; a += 0.1) {
+          let r = a * 8 + sin(time * 2 + a) * 10;
+          let col =
+            a % (TWO_PI / 3) < TWO_PI / 6
+              ? color(255, 215, 0)
+              : color(0, 206, 209);
+          pg.stroke(col);
+          pg.vertex(cos(a) * r, sin(a) * r);
+        }
+        pg.endShape();
 
         pg.pop();
       }
