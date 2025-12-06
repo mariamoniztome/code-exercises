@@ -50,33 +50,32 @@ function hidePlanetInfo() {
 }
 
 function toggleSound() {
-  soundEnabled = !soundEnabled;
   const icon = document.querySelector("#sound-toggle .icon");
 
-  if (soundEnabled) {
-    if (spaceSound && !spaceSound.isPlaying()) spaceSound.loop();
-    spaceSound.setVolume(0.5);
-    if (soundButton) {
-      const newIcon = document.createElement("i");
-      newIcon.setAttribute("data-lucide", "volume-2");
-      newIcon.className = "icon";
-      newIcon.style.width = "1.2em";
-      newIcon.style.height = "1.2em";
-      newIcon.style.color = "white";
-      icon.replaceWith(newIcon);
-      lucide.createIcons();
-    }
+  if (audioMode === "sound") {
+
+    // ➤ Mudar para modo voz
+    audioMode = "speech";
+    activateSpeechMode();
+
+    // Atualizar ícone para "mic"
+    const newIcon = document.createElement("i");
+    newIcon.setAttribute("data-lucide", "mic");
+    newIcon.className = "icon";
+    icon.replaceWith(newIcon);
+    lucide.createIcons();
+
   } else {
-    spaceSound.setVolume(0);
-    if (soundButton) {
-      const newIcon = document.createElement("i");
-      newIcon.setAttribute("data-lucide", "volume-x");
-      newIcon.className = "icon";
-      newIcon.style.width = "1.2em";
-      newIcon.style.height = "1.2em";
-      newIcon.style.color = "white";
-      icon.replaceWith(newIcon);
-      lucide.createIcons();
-    }
+
+    // ➤ Mudar para modo som
+    audioMode = "sound";
+    activateSoundMode();
+
+    // Atualizar ícone para volume-2
+    const newIcon = document.createElement("i");
+    newIcon.setAttribute("data-lucide", "volume-2");
+    newIcon.className = "icon";
+    icon.replaceWith(newIcon);
+    lucide.createIcons();
   }
 }

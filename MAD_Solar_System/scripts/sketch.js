@@ -5,6 +5,7 @@ let soundEnabled = true;
 let soundButton;
 let audioContext;
 let audioInitialized = false;
+let audioMode = 'sound';
 
 // Stars
 let stars = [];
@@ -36,6 +37,27 @@ let targetX = 0,
 let textureIndexToUpdate = 0;
 
 // Global functions
+// Active sound or speech mode
+function activateSoundMode() {
+  // p5.Sound
+  if (spaceSound && !spaceSound.isPlaying()) {
+    spaceSound.loop();
+    spaceSound.setVolume(0.5);
+  }
+
+  // Deactivate SpeechCommands
+  if (soundClassifier) soundClassifier.stop();
+
+  console.log("Modo SOM ativado");
+}
+
+function activateSpeechMode() {
+  if (spaceSound) spaceSound.setVolume(0);
+
+  if (soundClassifier) soundClassifier.classify(gotCommand);
+
+  console.log("Modo VOZ ativado");
+}
 
 // Auto adjust star count based on frame rate
 function autoAdjustStars() {
