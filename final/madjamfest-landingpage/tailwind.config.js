@@ -1,0 +1,148 @@
+export default {
+  content: [
+    "./src/**/*.{html,js,ts,jsx,tsx}",
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
+        error: "hsl(var(--error))",
+        info: "hsl(var(--info))",
+        grey: {
+          50: "#FAFAFA",
+          100: "#F5F5F5",
+          200: "#E5E5E5",
+          300: "#D4D4D4",
+          400: "#A3A3A3",
+          500: "#737373",
+          600: "#525252",
+          700: "#404040",
+          800: "#262626",
+          900: "#171717",
+        },
+      },
+      spacing: {
+        4: "var(--space-4)",
+        8: "var(--space-8)",
+        12: "var(--space-12)",
+        16: "var(--space-16)",
+        24: "var(--space-24)",
+        32: "var(--space-32)",
+        48: "var(--space-48)",
+        64: "var(--space-64)",
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        full: "var(--radius-full)",
+        "8": "var(--radius-8)",
+        "4": "var(--radius-4)",
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+      },
+      fontSize: {
+        display: "var(--font-display)",
+        title: "var(--font-title)",
+        h1: "var(--font-h1)",
+        h2: "var(--font-h2)",
+        h3: "var(--font-h3)",
+        body: "var(--font-body)",
+        "body-small": "var(--font-body-small)",
+        caption: "var(--font-caption)",
+      },
+      fontFamily: {
+        sans: [
+          "Neue Montreal",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+          '"Noto Color Emoji"',
+        ],
+        montreal: ["Neue Montreal", "sans-serif"],
+        "montreal-bold": ["Neue Montreal Bold", "sans-serif"],
+        "montreal-medium": ["Neue Montreal Medium", "sans-serif"],
+        "montreal-italic": ["Neue Montreal Italic", "sans-serif"],
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 1.5s ease-out",
+        "fade-in-up": "fade-in-up 1.2s ease-out",
+        "spin-slow": "spin-slow 20s linear infinite",
+        marquee: "marquee 40s linear infinite",
+      },
+    },
+    container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
+  },
+  plugins: [],
+  darkMode: ["class"],
+};
