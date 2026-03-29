@@ -59,18 +59,10 @@
         "desc": "Vila do Conde celebra os 140 anos do nascimento com exposicoes, espetaculos, percursos poeticos e cinema."
       }
     ],
-    "poemsTitle": "Fragmentos da sua Voz",
     "ctaLabel": "Experiencia de Realidade Aumentada",
-    "ctaButton": "Entrar na Poesia ->"
+    "ctaButton": "Iniciar Scan AR ->"
   },
   "screens": {
-    "arIntro": {
-      "title": "A Arvore dos Versos",
-      "subtitle": "Escolhe um poema e aponta para o QR correspondente",
-      "startButton": "Iniciar Camara",
-      "hint": "Imprime o QR do poema escolhido, aponta a camara e interage com o modelo 3D (rodar/zoom)",
-      "backButton": "<- Voltar a Timeline"
-    },
     "ar": {
       "loadingText": "A despertar o mundo poetico...",
       "hudTitle": "A Arvore dos Versos",
@@ -83,7 +75,7 @@
     "ar": {
       "indicatorPrefix": "Poema: ",
       "indicatorNoCamera": "Sem camara ativa",
-      "statusPointToQr": "Aponta a camara para o QR do marcador. Arrasta para rodar, pinca para zoom e duplo toque para auto-spin.",
+      "statusPointToQr": "Aponta a camara para qualquer QR do marcador. Arrasta para rodar, pinca para zoom e duplo toque para auto-spin.",
       "statusQrDetected": "QR detetado - o mundo desperta...",
       "statusWorldBloom": "O mundo poetico esta vivo"
     },
@@ -170,7 +162,7 @@
     "title": "A Arvore dos Versos",
     "subtitle": "Marcadores de Realidade Aumentada - Poeta Carpinteiro",
     "instructionLine1": "Imprime esta pagina e recorta cada marcador pelo tracejado.",
-    "instructionLine2": "Abre a aplicacao no telemovel, escolhe o poema correspondente",
+    "instructionLine2": "Abre a aplicacao no telemovel e inicia o scan AR",
     "instructionLine3": "e aponta a camara para o codigo QR para despertar o mundo 3D.",
     "printButton": "Imprimir Marcadores",
     "markerPrefix": "Marcador ",

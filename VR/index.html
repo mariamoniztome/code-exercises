@@ -268,35 +268,6 @@
       transform: translateX(-50%) scale(1.3);
     }
 
-    /* ─── Poems section ─── */
-    .tl-poems-title {
-      text-align: center;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--sepia);
-      margin: 48px 0 8px;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
-
-    .tl-poem-excerpt {
-      max-width: 500px;
-      margin: 0 auto 16px;
-      padding: 20px 28px;
-      background: rgba(122, 92, 46, 0.07);
-      border-left: 2px solid var(--sepia);
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      font-size: 1rem;
-      line-height: 1.9;
-      color: var(--paper-dark);
-      opacity: 0;
-    }
-
-    .tl-poem-excerpt.visible { opacity: 1; }
-
     /* ─── CTA ─── */
     .tl-cta-wrap {
       text-align: center;
@@ -338,111 +309,6 @@
     }
 
     .tl-cta:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--sepia-dark); }
-
-    /* ═══════════════════════════════════════
-       SCREEN 2 — AR INSTRUCTIONS
-    ═══════════════════════════════════════ */
-    #screen-ar-intro {
-      position: fixed;
-      inset: 0;
-      background: var(--ink);
-      z-index: 90;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      text-align: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
-    }
-
-    #screen-ar-intro.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .ar-intro-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.6rem, 5vw, 2.5rem);
-      color: var(--paper);
-      margin-bottom: 12px;
-    }
-
-    .ar-intro-sub {
-      font-family: 'IM Fell English', serif;
-      font-style: italic;
-      color: var(--sepia);
-      font-size: 1.1rem;
-      margin-bottom: 40px;
-    }
-
-    .ar-markers {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-
-    .ar-marker-card {
-      background: rgba(122,92,46,0.12);
-      border: 1px solid rgba(200,169,110,0.3);
-      border-radius: 2px;
-      padding: 16px 20px;
-      width: 160px;
-      cursor: pointer;
-      transition: background 0.3s, border-color 0.3s;
-    }
-
-    .ar-marker-card:hover {
-      background: rgba(122,92,46,0.25);
-      border-color: var(--sepia);
-    }
-
-    .ar-marker-card.selected {
-      background: rgba(122,92,46,0.3);
-      border-color: var(--sepia);
-      box-shadow: 0 0 0 1px var(--sepia);
-    }
-
-    .ar-marker-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      color: var(--sepia);
-      margin-bottom: 4px;
-    }
-
-    .ar-marker-name {
-      font-family: 'Crimson Text', serif;
-      font-size: 0.85rem;
-      color: var(--paper-dark);
-      font-style: italic;
-    }
-
-    .ar-btn {
-      font-family: 'Playfair Display', serif;
-      font-size: 1rem;
-      color: var(--ink);
-      background: var(--sepia);
-      border: none;
-      padding: 14px 40px;
-      cursor: pointer;
-      transition: background 0.3s;
-      margin-bottom: 16px;
-      display: block;
-      margin: 0 auto 16px;
-    }
-
-    .ar-btn:hover { background: var(--paper); }
-
-    .ar-hint {
-      font-family: 'Crimson Text', serif;
-      font-size: 0.85rem;
-      color: var(--sepia-dark);
-      font-style: italic;
-    }
 
     /* ═══════════════════════════════════════
        SCREEN 3 — AR SCENE
@@ -699,35 +565,12 @@
   <!-- Timeline events -->
   <div class="tl-timeline" id="tl-events-container"></div>
 
-  <!-- Poem excerpts -->
-  <div style="max-width:700px; margin: 0 auto; padding: 0 24px;">
-    <p class="tl-poems-title" id="tl-poems-title"></p>
-    <div id="tl-excerpts-container"></div>
-  </div>
-
   <!-- CTA -->
   <div class="tl-cta-wrap">
     <p class="tl-cta-label" id="tl-cta-label"></p>
     <button class="tl-cta" id="btn-enter-ar"></button>
   </div>
 
-</div>
-
-<!-- ═══════════════════════════════════════
-     SCREEN 2 — AR INTRO
-═══════════════════════════════════════ -->
-<div id="screen-ar-intro">
-  <h2 class="ar-intro-title" id="ar-intro-title"></h2>
-  <p class="ar-intro-sub" id="ar-intro-sub"></p>
-
-  <div class="ar-markers" id="ar-marker-cards"></div>
-
-  <button class="ar-btn" id="btn-start-ar"></button>
-  <p class="ar-hint" id="ar-intro-hint"></p>
-
-  <div style="margin-top: 24px;">
-    <button id="ar-intro-back" onclick="showScreen('timeline')" style="background:none;border:none;color:var(--sepia-dark);font-family:'Crimson Text',serif;font-size:0.85rem;cursor:pointer;letter-spacing:1px;"></button>
-  </div>
 </div>
 
 <!-- ═══════════════════════════════════════

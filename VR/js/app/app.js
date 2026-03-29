@@ -16,5 +16,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   UIController.bindUIEvents();
   UIController.initTimelineAnimations();
-  UIController.initPoemSelector();
 });

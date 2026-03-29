@@ -48,61 +48,16 @@
     });
   }
 
-  function renderPoemExcerpts() {
-    var container = document.getElementById('tl-excerpts-container');
-    if (!container) return;
-
-    var poems = get('poems', []);
-    container.innerHTML = '';
-
-    poems.forEach(function(poem) {
-      var quote = document.createElement('blockquote');
-      quote.className = 'tl-poem-excerpt';
-      quote.innerHTML = (poem.verses || []).join('<br>');
-      container.appendChild(quote);
-    });
-  }
-
-  function renderPoemCards() {
-    var cardsWrap = document.getElementById('ar-marker-cards');
-    if (!cardsWrap) return;
-
-    var poems = get('poems', []);
-    cardsWrap.innerHTML = '';
-
-    poems.forEach(function(poem, index) {
-      var marker = poem.marker || {};
-      var card = document.createElement('div');
-      card.className = 'ar-marker-card' + (index === 0 ? ' selected' : '');
-      card.setAttribute('data-poem', String(index));
-      card.innerHTML = [
-        '<div class="ar-marker-num">', (marker.roman || String(index + 1)), '</div>',
-        '<div class="ar-marker-name">', (poem.title || ''), '</div>'
-      ].join('');
-      cardsWrap.appendChild(card);
-    });
-  }
-
   function apply() {
     setText('tl-eyebrow', get('timelinePage.header.eyebrow', ''));
     setHtml('tl-title', get('timelinePage.header.titleHtml', ''));
     setText('tl-subtitle', get('timelinePage.header.subtitle', ''));
     setText('tl-dates', get('timelinePage.header.dates', ''));
     setHtml('tl-bio', get('timelinePage.bioHtml', ''));
-    setText('tl-poems-title', get('timelinePage.poemsTitle', ''));
     setText('tl-cta-label', get('timelinePage.ctaLabel', ''));
     setText('btn-enter-ar', get('timelinePage.ctaButton', ''));
 
     renderTimelineEvents();
-    renderPoemExcerpts();
-
-    setText('ar-intro-title', get('screens.arIntro.title', ''));
-    setText('ar-intro-sub', get('screens.arIntro.subtitle', ''));
-    setText('btn-start-ar', get('screens.arIntro.startButton', ''));
-    setText('ar-intro-hint', get('screens.arIntro.hint', ''));
-    setText('ar-intro-back', get('screens.arIntro.backButton', ''));
-
-    renderPoemCards();
 
     setText('ar-loading-text', get('screens.ar.loadingText', ''));
     setText('ar-hud-title-text', get('screens.ar.hudTitle', ''));

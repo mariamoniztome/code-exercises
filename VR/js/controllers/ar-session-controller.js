@@ -39,8 +39,7 @@
 
     setTimeout(() => loadingEl.classList.add('hidden'), 800);
 
-    const poem = TreeOfVerses.getPoemData(windowObj.AppState.selectedPoem);
-    indicatorEl.textContent = t('ui.ar.indicatorPrefix', 'Poema: ') + poem.title;
+    indicatorEl.textContent = t('screens.ar.hudIndicatorWaiting', 'Aguarda o QR...');
     statusEl.textContent = t('ui.ar.statusPointToQr', 'Aponta a camara para o QR do marcador');
 
     AREngine.onMarkerFound = (poemIndex) => {
