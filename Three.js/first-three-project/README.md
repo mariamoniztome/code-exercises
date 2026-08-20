@@ -1,69 +1,55 @@
-# React + TypeScript + Vite
+# First Three Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Primeiro projeto Three.js integrado com **React + TypeScript + Vite**. Serve como
+exercício de tipos de luzes: cada luz é criada e configurada via `lil-gui`, com
+helpers visuais para entender seu alcance/direção.
 
-Currently, two official plugins are available:
+## O que a cena demonstra
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Três geometrias básicas (`SphereGeometry`, `BoxGeometry`, `TorusGeometry`) e um
+  `PlaneGeometry` como chão, todas usando o mesmo `MeshStandardMaterial`.
+- Rotação contínua dos objetos no loop de animação (`requestAnimationFrame`).
+- Todos os tipos de luz do Three.js configurados: `AmbientLight`, `DirectionalLight`,
+  `HemisphereLight`, `PointLight`, `RectAreaLight` e `SpotLight` (algumas comentadas/
+  desativadas no código, mas prontas para serem ligadas), cada uma com seu respectivo
+  *helper* (`DirectionalLightHelper`, `HemisphereLightHelper`, `PointLightHelper`,
+  `SpotLightHelper`).
+- Painel `lil-gui` com controles de intensidade e posição para todas as luzes.
+- Sombras (`shadowMap` no renderer, `castShadow`/`receiveShadow` nos objetos).
+- `OrbitControls` com damping.
+- Integração com React via `useEffect` + `useRef` no `canvas`, com cleanup completo
+  (dispose de controls, renderer, material e GUI) ao desmontar o componente.
 
-## Expanding the ESLint configuration
+## Tecnologias
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/)
+- [Three.js](https://threejs.org/) (`three`)
+- [lil-gui](https://github.com/georgealways/lil-gui)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Estrutura
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+  App.tsx       # toda a cena Three.js (luzes, objetos, câmera, loop de render)
+  App.css
+  main.tsx      # entrada React
+public/
+  textures/     # texturas de exemplo (door, checkerboards, minecraft) disponíveis
+                # para outros exercícios de material
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Como executar
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+Outros scripts disponíveis: `npm run build`, `npm run preview`, `npm run lint`.
+
+## Controles
+
+- Arrastar com o botão esquerdo do mouse: orbitar a câmera.
+- Scroll: zoom.
+- Painel lil-gui: ajustar intensidade e posição de cada luz.
